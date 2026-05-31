@@ -29,7 +29,7 @@
 
   .hero {
     min-height: auto;
-    padding-top: 220px;
+    padding-top: 236px;
   }
 
   .hero-visual {
@@ -58,14 +58,35 @@
   }
 
   .site-header {
-    top: 10px;
-    width: min(100% - 22px, 520px);
+    top: 0;
+    width: 100%;
     padding: 10px;
     display: grid;
   }
 
+  .site-header:not(.solid) {
+    display: grid;
+    direction: rtl;
+  }
+
+  .site-header:not(.solid) .brand,
+  .site-header:not(.solid) .nav-links,
+  .site-header:not(.solid) .header-call {
+    direction: rtl;
+    margin: 0;
+  }
+
+  .site-header:not(.solid) .brand {
+    order: 1;
+  }
+
+  .site-header:not(.solid) .nav-links {
+    order: 3;
+  }
+
   .site-header.solid {
     top: 10px;
+    width: min(100% - 22px, 520px);
   }
 
   .header-call {
@@ -99,7 +120,7 @@
   }
 
   .home-notice {
-    top: 142px;
+    top: 136px;
     width: min(100% - 22px, 520px);
     grid-template-columns: 1fr auto;
     gap: 8px;
@@ -114,7 +135,7 @@
   }
 
   .hero {
-    padding-top: 238px;
+    padding-top: 236px;
     gap: 18px;
   }
 
