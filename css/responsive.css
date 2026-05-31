@@ -4,8 +4,10 @@
   }
 
   .site-header {
-    align-items: flex-start;
+    align-items: center;
     flex-wrap: wrap;
+    min-height: auto;
+    gap: 10px;
   }
 
   .nav-links {
@@ -54,17 +56,34 @@
   }
 
   .site-header {
-    margin-top: 10px;
+    top: 10px;
+    width: min(100% - 22px, 520px);
     padding: 10px;
+  }
+
+  .site-header.solid {
+    top: 10px;
   }
 
   .header-call {
     display: none;
   }
 
+  .brand {
+    min-width: 0;
+    flex: 1;
+  }
+
   .nav-links {
     gap: 16px;
     font-size: 13px;
+    border-radius: var(--radius);
+    padding: 6px;
+  }
+
+  .nav-links a {
+    min-height: 32px;
+    padding: 0 8px;
   }
 
   .hero {
