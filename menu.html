@@ -54,6 +54,7 @@
             <h2>اختياراتك</h2>
           </div>
           <strong id="cartCount">0</strong>
+          <button class="cart-close" id="cartClose" type="button" aria-label="إغلاق السلة">×</button>
         </div>
         <div class="cart-items" id="cartItems"></div>
         <p class="empty-cart" id="emptyCart">السلة فارغة حالياً. أضف وجبة لتجميع أفكارك قبل مناداة النادل.</p>
@@ -66,6 +67,14 @@
       </aside>
     </section>
   </main>
+
+  <button class="cart-float" id="cartToggle" type="button" aria-label="فتح سلة العرض">
+    <span class="cart-float-count" id="cartFloatCount">0</span>
+    <span class="cart-float-title">سلة العرض</span>
+    <strong id="cartFloatTotal">0 ₪</strong>
+  </button>
+
+  <div class="cart-backdrop" id="cartBackdrop" aria-hidden="true"></div>
 
   <div class="customizer" id="customizer" aria-hidden="true">
     <div class="customizer-dialog" role="dialog" aria-modal="true" aria-labelledby="customizerTitle">

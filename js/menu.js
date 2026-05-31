@@ -12,6 +12,12 @@
   const cartTotal = document.getElementById("cartTotal");
   const emptyCart = document.getElementById("emptyCart");
   const clearCart = document.getElementById("clearCart");
+  const cartPanel = document.querySelector(".cart-panel");
+  const cartToggle = document.getElementById("cartToggle");
+  const cartClose = document.getElementById("cartClose");
+  const cartBackdrop = document.getElementById("cartBackdrop");
+  const cartFloatCount = document.getElementById("cartFloatCount");
+  const cartFloatTotal = document.getElementById("cartFloatTotal");
   const customizer = document.getElementById("customizer");
   const closeCustomizer = document.getElementById("closeCustomizer");
   const saveCartItem = document.getElementById("saveCartItem");
@@ -236,6 +242,18 @@
     price: Number(input.dataset.price || 0)
   }));
 
+  const openCart = () => {
+    cartPanel.classList.add("is-open");
+    cartBackdrop.classList.add("is-open");
+    cartBackdrop.setAttribute("aria-hidden", "false");
+  };
+
+  const closeCart = () => {
+    cartPanel.classList.remove("is-open");
+    cartBackdrop.classList.remove("is-open");
+    cartBackdrop.setAttribute("aria-hidden", "true");
+  };
+
   const saveItem = () => {
     if (!activeProduct) return;
 
@@ -301,6 +319,9 @@
     cartItems.replaceChildren(fragment);
     cartCount.textContent = count;
     cartTotal.textContent = formatPrice(total);
+    cartFloatCount.textContent = count;
+    cartFloatTotal.textContent = formatPrice(total);
+    cartToggle.classList.toggle("has-items", count > 0);
     emptyCart.hidden = cart.length > 0;
     clearCart.disabled = cart.length === 0;
   };
@@ -338,6 +359,10 @@
     renderCart();
   });
 
+  cartToggle.addEventListener("click", openCart);
+  cartClose.addEventListener("click", closeCart);
+  cartBackdrop.addEventListener("click", closeCart);
+
   closeCustomizer.addEventListener("click", closeModal);
   saveCartItem.addEventListener("click", saveItem);
   customizer.addEventListener("click", (event) => {
@@ -345,6 +370,7 @@
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && customizer.classList.contains("is-open")) closeModal();
+    if (event.key === "Escape" && cartPanel.classList.contains("is-open")) closeCart();
   });
 
   renderTabs();

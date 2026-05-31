@@ -5,6 +5,7 @@
 
   .site-header {
     align-items: center;
+    grid-template-columns: 1fr auto;
     flex-wrap: wrap;
     min-height: auto;
     gap: 10px;
@@ -12,6 +13,7 @@
 
   .nav-links {
     order: 3;
+    grid-column: 1 / -1;
     width: 100%;
     justify-content: flex-start;
     overflow-x: auto;
@@ -59,6 +61,7 @@
     top: 10px;
     width: min(100% - 22px, 520px);
     padding: 10px;
+    display: grid;
   }
 
   .site-header.solid {
@@ -71,11 +74,10 @@
 
   .brand {
     min-width: 0;
-    flex: 1;
   }
 
   .nav-links {
-    gap: 16px;
+    gap: 6px;
     font-size: 13px;
     border-radius: var(--radius);
     padding: 6px;
