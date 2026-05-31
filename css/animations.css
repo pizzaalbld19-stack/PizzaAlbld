@@ -1,0 +1,156 @@
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(242, 184, 75, .12), transparent 20rem),
+    #100b08;
+  transition: opacity .55s ease, visibility .55s ease;
+}
+
+.loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-scene {
+  position: relative;
+  width: min(320px, 76vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.loader-pizza {
+  width: 240px;
+  max-width: 74vw;
+  filter: drop-shadow(0 26px 44px rgba(0, 0, 0, .48));
+  animation: pizzaWarmIn .6s ease both;
+}
+
+.loader-knife {
+  position: absolute;
+  top: -170px;
+  width: 56px;
+  transform-origin: 50% 100%;
+  animation: knifeDrop 1.45s cubic-bezier(.18, .86, .18, 1) .45s both;
+  filter: drop-shadow(0 20px 22px rgba(0, 0, 0, .4));
+}
+
+.pizza-slice {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sliceOut .72s ease 1.92s both;
+}
+
+.slice-1 { --x: 0px; --y: -34px; }
+.slice-2 { --x: 27px; --y: -27px; }
+.slice-3 { --x: 34px; --y: 0px; }
+.slice-4 { --x: 27px; --y: 27px; }
+.slice-5 { --x: 0px; --y: 34px; }
+.slice-6 { --x: -27px; --y: 27px; }
+.slice-7 { --x: -34px; --y: 0px; }
+.slice-8 { --x: -27px; --y: -27px; }
+
+.loader-toppings {
+  animation: toppingsFade .35s ease 1.95s both;
+}
+
+body.page-ready .page-shell,
+body.page-ready .site-header,
+body.page-ready .site-footer {
+  animation: pageIn .7s ease both;
+}
+
+.section-reveal,
+.stagger-item {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity .72s ease, transform .72s ease;
+}
+
+.section-reveal.is-visible,
+.stagger-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-reveal .section-heading h2,
+.section-reveal .section-heading h1 {
+  transform: translateY(18px);
+  opacity: 0;
+  transition: opacity .62s ease .08s, transform .62s ease .08s;
+}
+
+.section-reveal.is-visible .section-heading h2,
+.section-reveal.is-visible .section-heading h1 {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.gallery-item {
+  opacity: 0;
+  transform: scale(.96);
+  transition: opacity .6s ease, transform .6s ease;
+}
+
+.gallery.is-visible .gallery-item {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.gallery.is-visible .gallery-item:nth-child(2) { transition-delay: .08s; }
+.gallery.is-visible .gallery-item:nth-child(3) { transition-delay: .16s; }
+.gallery.is-visible .gallery-item:nth-child(4) { transition-delay: .24s; }
+
+@keyframes pizzaWarmIn {
+  from { opacity: 0; transform: scale(.82) rotate(-18deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes knifeDrop {
+  0% { transform: translateY(0) rotate(-10deg); opacity: 0; }
+  16% { opacity: 1; }
+  72% { transform: translateY(210px) rotate(0deg); }
+  82% { transform: translateY(198px) rotate(2deg); }
+  100% { transform: translateY(210px) rotate(0deg); opacity: 1; }
+}
+
+@keyframes sliceOut {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  62% { transform: translate(var(--x), var(--y)) scale(1.015); opacity: 1; }
+  100% { transform: translate(calc(var(--x) * 1.45), calc(var(--y) * 1.45)) scale(.96); opacity: 0; }
+}
+
+@keyframes toppingsFade {
+  to { opacity: 0; }
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: scale(.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .001ms !important;
+  }
+
+  .loader {
+    display: none;
+  }
+
+  .section-reveal,
+  .stagger-item,
+  .gallery-item {
+    opacity: 1;
+    transform: none;
+  }
+}
