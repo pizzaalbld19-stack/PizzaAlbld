@@ -29,7 +29,7 @@
 
   .hero {
     min-height: auto;
-    padding-top: 180px;
+    padding-top: 220px;
   }
 
   .hero-visual {
@@ -98,8 +98,23 @@
     padding: 0 8px;
   }
 
+  .home-notice {
+    top: 142px;
+    width: min(100% - 22px, 520px);
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .home-notice span {
+    display: none;
+  }
+
+  .home-notice p {
+    font-size: 13px;
+  }
+
   .hero {
-    padding-top: 166px;
+    padding-top: 238px;
     gap: 18px;
   }
 

@@ -155,6 +155,51 @@ input {
   font-weight: 700;
 }
 
+.home-notice {
+  position: fixed;
+  top: 92px;
+  left: 50%;
+  z-index: 45;
+  width: min(760px, calc(100% - 40px));
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 12px;
+  border: 1px solid rgba(242, 184, 75, .24);
+  border-radius: var(--radius);
+  background: rgba(28, 21, 16, .86);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(16px);
+  transform: translateX(-50%);
+}
+
+.home-notice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #211106;
+  background: var(--gold);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.home-notice p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.home-notice a {
+  color: var(--gold);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .page-shell,
 .menu-shell {
   width: var(--container);
@@ -167,7 +212,7 @@ input {
   grid-template-columns: minmax(0, .95fr) minmax(320px, 1.05fr);
   align-items: center;
   gap: 42px;
-  padding: 130px 0 70px;
+  padding: 160px 0 70px;
 }
 
 .hero-content {
