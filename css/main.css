@@ -432,6 +432,10 @@ section:not(.hero) {
   margin-top: 24px;
 }
 
+.map-link {
+  margin-top: 14px;
+}
+
 .site-footer {
   width: var(--container);
   margin: 0 auto;
