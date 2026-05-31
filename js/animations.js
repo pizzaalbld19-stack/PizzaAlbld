@@ -14,7 +14,7 @@
     revealPage();
   } else {
     window.addEventListener("load", () => {
-      window.setTimeout(revealPage, 2850);
+      window.setTimeout(revealPage, 4550);
     });
   }
 

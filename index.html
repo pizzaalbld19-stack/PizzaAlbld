@@ -41,37 +41,44 @@
 </head>
 <body>
   <div class="loader" id="siteLoader" aria-label="تحميل الموقع">
-    <div class="loader-scene" aria-hidden="true">
-      <svg class="loader-pizza" viewBox="0 0 240 240" role="img">
-        <defs>
-          <clipPath id="sliceClip1"><path d="M120 120 L120 16 A104 104 0 0 1 193.5 46.5 Z"/></clipPath>
-          <clipPath id="sliceClip2"><path d="M120 120 L193.5 46.5 A104 104 0 0 1 224 120 Z"/></clipPath>
-          <clipPath id="sliceClip3"><path d="M120 120 L224 120 A104 104 0 0 1 193.5 193.5 Z"/></clipPath>
-          <clipPath id="sliceClip4"><path d="M120 120 L193.5 193.5 A104 104 0 0 1 120 224 Z"/></clipPath>
-          <clipPath id="sliceClip5"><path d="M120 120 L120 224 A104 104 0 0 1 46.5 193.5 Z"/></clipPath>
-          <clipPath id="sliceClip6"><path d="M120 120 L46.5 193.5 A104 104 0 0 1 16 120 Z"/></clipPath>
-          <clipPath id="sliceClip7"><path d="M120 120 L16 120 A104 104 0 0 1 46.5 46.5 Z"/></clipPath>
-          <clipPath id="sliceClip8"><path d="M120 120 L46.5 46.5 A104 104 0 0 1 120 16 Z"/></clipPath>
-        </defs>
-        <g class="pizza-slices">
-          <g class="pizza-slice slice-1" clip-path="url(#sliceClip1)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-2" clip-path="url(#sliceClip2)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-3" clip-path="url(#sliceClip3)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-4" clip-path="url(#sliceClip4)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-5" clip-path="url(#sliceClip5)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-6" clip-path="url(#sliceClip6)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-7" clip-path="url(#sliceClip7)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-          <g class="pizza-slice slice-8" clip-path="url(#sliceClip8)"><circle cx="120" cy="120" r="104" fill="#f3b548"/><circle cx="120" cy="120" r="92" fill="#e95830"/><circle cx="120" cy="120" r="78" fill="#ffd36a"/></g>
-        </g>
-        <g class="loader-toppings">
-          <circle cx="148" cy="74" r="8" fill="#8f2118"/><circle cx="178" cy="122" r="8" fill="#8f2118"/><circle cx="138" cy="164" r="8" fill="#8f2118"/><circle cx="86" cy="152" r="8" fill="#8f2118"/><circle cx="72" cy="96" r="8" fill="#8f2118"/>
-          <circle cx="104" cy="72" r="5" fill="#2f7a43"/><circle cx="172" cy="158" r="5" fill="#2f7a43"/><circle cx="82" cy="128" r="5" fill="#2f7a43"/>
-        </g>
-      </svg>
-      <svg class="loader-knife" viewBox="0 0 56 210" aria-hidden="true">
-        <path d="M28 6 C37 22 39 44 35 75 L31 142 L25 142 L21 75 C17 44 19 22 28 6Z" fill="#f3f1e8"/>
-        <path d="M25 141 H31 L35 200 C31 207 25 207 21 200Z" fill="#8f2118"/>
-      </svg>
+    <div class="loader-glow" aria-hidden="true"></div>
+    <div class="loader-stage" aria-hidden="true">
+      <div class="oven">
+        <div class="oven-arch"></div>
+        <div class="oven-mouth">
+          <span class="flame flame-1"></span>
+          <span class="flame flame-2"></span>
+          <span class="flame flame-3"></span>
+          <span class="ember ember-1"></span>
+          <span class="ember ember-2"></span>
+          <span class="ember ember-3"></span>
+          <span class="ember ember-4"></span>
+        </div>
+      </div>
+      <div class="loader-peel">
+        <span></span>
+      </div>
+      <div class="cinema-pizza">
+        <div class="cinema-crust"></div>
+        <div class="cinema-sauce"></div>
+        <div class="cinema-cheese"></div>
+        <i class="pep p1"></i>
+        <i class="pep p2"></i>
+        <i class="pep p3"></i>
+        <i class="olive o1"></i>
+        <i class="olive o2"></i>
+        <i class="basil b1"></i>
+        <i class="basil b2"></i>
+        <span class="cut-line c1"></span>
+        <span class="cut-line c2"></span>
+        <span class="cut-line c3"></span>
+        <span class="cut-line c4"></span>
+      </div>
+      <div class="loader-brand">
+        <img src="assets/logo.png" alt="">
+        <strong>بيتسا البلد</strong>
+        <span>نجهز الفرن...</span>
+      </div>
     </div>
   </div>
 
