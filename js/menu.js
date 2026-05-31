@@ -1,4 +1,5 @@
 (function () {
+  const site = window.PIZZA_BALAD_SITE || {};
   const menu = Array.isArray(window.PIZZA_BALAD_MENU) ? window.PIZZA_BALAD_MENU : [];
   const categories = ["الكل", "بيتسا", "باستا", "رڤيولي", "سلطات", "مشروبات"];
   const grid = document.getElementById("productsGrid");
@@ -40,6 +41,12 @@
   let editingCartId = null;
 
   if (year) year.textContent = new Date().getFullYear();
+
+  if (site.phone?.tel) {
+    document.querySelectorAll("[data-site-phone-link]").forEach((link) => {
+      link.href = `tel:${site.phone.tel}`;
+    });
+  }
 
   const formatPrice = (price) => `${price} ₪`;
   const normalize = (value) => String(value || "").trim().toLowerCase();
