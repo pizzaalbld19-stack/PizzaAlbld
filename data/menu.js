@@ -4,87 +4,172 @@ window.PIZZA_BALAD_MENU = [
     category: "بيتسا",
     name: "بيتسا حجم عائلي",
     description: "بيتسا كبيرة مناسبة للمشاركة مع جبنة موزاريلا وصوص البيت الخاص",
-    price: 65,
-    image: "photos/بيتسا حجم عائلي.jpg"
+    price: 60,
+    image: "photos/بيتسا حجم عائلي.jpg",
+    ingredients: ["صلصة طماطم", "جبنة"],
+    removableIngredients: ["صلصة طماطم", "جبنة"],
+    freeAddons: ["زيتون أخضر", "ذرة", "فلفل حار"],
+    paidAddons: [
+      { name: "زيتون أسود", price: 5 },
+      { name: "فقع", price: 5 },
+      { name: "طماطم", price: 5 },
+      { name: "بصل", price: 5 },
+      { name: "فلفل ألوان", price: 5 },
+      { name: "تونة", price: 5 }
+    ]
   },
   {
     id: 2,
     category: "بيتسا",
     name: "بيتسا شخصية",
     description: "بيتسا فردية ساخنة بعجينة طرية وأطراف ذهبية مقرمشة",
-    price: 28,
-    image: "photos/بيتسا شخصية.jpg"
+    price: 30,
+    image: "photos/بيتسا شخصية.jpg",
+    ingredients: ["صلصة طماطم", "جبنة"],
+    removableIngredients: ["صلصة طماطم", "جبنة"],
+    freeAddons: ["زيتون أخضر", "ذرة", "فلفل حار"],
+    paidAddons: [
+      { name: "زيتون أسود", price: 5 },
+      { name: "فقع", price: 5 },
+      { name: "طماطم", price: 5 },
+      { name: "بصل", price: 5 },
+      { name: "فلفل ألوان", price: 5 },
+      { name: "تونة", price: 5 }
+    ]
   },
   {
     id: 3,
     category: "باستا",
     name: "باستا روزيه",
     description: "باستا بصوص روزيه كريمي متوازن مع لمسة طماطم غنية",
-    price: 38,
-    image: "photos/باستا روزيه.jpg"
+    price: 35,
+    image: "photos/باستا روزيه.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: [
+      { name: "جبنة موتزاريلا", price: 5 },
+      { name: "جبنة بارميزان", price: 5 }
+    ]
   },
   {
     id: 4,
     category: "باستا",
     name: "باستا باشاميل",
     description: "باستا مخبوزة بصوص باشاميل ناعم وطبقة ذهبية شهية",
-    price: 40,
-    image: "photos/باستا باشاميل.jpg"
+    price: 35,
+    image: "photos/باستا باشاميل.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: [
+      { name: "جبنة موتزاريلا", price: 5 },
+      { name: "جبنة بارميزان", price: 5 }
+    ]
   },
   {
     id: 5,
     category: "رڤيولي",
     name: "رڤيولي جبنة",
     description: "رڤيولي محشو بالجبنة مع صوص غني يقدم ساخناً",
-    price: 48,
-    image: "photos/رفيولي جبنة.jpg"
+    price: 40,
+    image: "photos/رفيولي جبنة.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: [
+      { name: "موتزاريلا", price: 5 },
+      { name: "جبنة بارميزان", price: 5 }
+    ]
   },
   {
     id: 6,
     category: "رڤيولي",
     name: "رڤيولي بطاطا",
     description: "رڤيولي بحشوة بطاطا ناعمة وصوص يبرز النكهة",
-    price: 46,
-    image: "photos/رفيولي بطاطا.jpg"
+    price: 40,
+    image: "photos/رفيولي بطاطا.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: [
+      { name: "موتزاريلا", price: 5 },
+      { name: "جبنة بارميزان", price: 5 }
+    ]
   },
   {
     id: 7,
-    category: "سلطات",
-    name: "سلطة قيصر",
-    description: "خس طازج، صوص قيصر، كروتون مقرمش، ولمسة جبن",
-    price: 32,
-    image: "photos/سلطة قيصر.jpg"
+    category: "رڤيولي",
+    name: "رڤيولي مخلط",
+    description: "تشكيلة رڤيولي من الجبنة والبطاطا في طبق واحد غني",
+    price: 40,
+    image: "photos/رفيولي جبنة.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: [
+      { name: "موتزاريلا", price: 5 },
+      { name: "جبنة بارميزان", price: 5 }
+    ]
   },
   {
     id: 8,
     category: "سلطات",
-    name: "سلطة يونانية",
-    description: "خضار طازجة مع جبنة بيضاء وزيتون وصوص خفيف",
-    price: 30,
-    image: "photos/سلطة يونانية.jpg"
+    name: "سلطة قيصر",
+    description: "خس طازج، صوص قيصر، كروتون مقرمش، ولمسة جبن",
+    price: 25,
+    image: "photos/سلطة قيصر.jpg",
+    ingredients: ["خس", "خبز", "جبنة بارميزان", "صوص خاص"],
+    removableIngredients: ["خس", "خبز", "جبنة بارميزان", "صوص خاص"],
+    freeAddons: [],
+    paidAddons: []
   },
   {
     id: 9,
     category: "سلطات",
-    name: "سلطة تبولة",
-    description: "تبولة طازجة بالبقدونس، الطماطم، البرغل، والليمون",
-    price: 24,
-    image: "photos/سلطة تبولة.jpg"
+    name: "سلطة يونانية",
+    description: "خضار طازجة مع جبنة بيضاء وزيتون وصوص خفيف",
+    price: 25,
+    image: "photos/سلطة يونانية.jpg",
+    ingredients: ["خس", "طماطم", "خيار", "زيتون أسود", "بصل أحمر", "فلفل أصفر", "جبنة بولغارية", "زعتر", "عصير ليمون"],
+    removableIngredients: ["خس", "طماطم", "خيار", "زيتون أسود", "بصل أحمر", "فلفل أصفر", "جبنة بولغارية", "زعتر", "عصير ليمون"],
+    freeAddons: [],
+    paidAddons: []
   },
   {
     id: 10,
-    category: "مشروبات",
-    name: "مشروب تشات صغير",
-    description: "مشروب مبرد بحجم صغير مناسب مع الوجبة",
-    price: 8,
-    image: "photos/مشروب تشات صغير.jpg"
+    category: "سلطات",
+    name: "سلطة تبولة",
+    description: "تبولة طازجة بالبقدونس، الطماطم، البرغل، والليمون",
+    price: 25,
+    image: "photos/سلطة تبولة.jpg",
+    ingredients: ["بقدونس", "نعنع", "بصل أخضر", "بندورة", "برغل"],
+    removableIngredients: ["بقدونس", "نعنع", "بصل أخضر", "بندورة", "برغل"],
+    freeAddons: [],
+    paidAddons: []
   },
   {
     id: 11,
     category: "مشروبات",
+    name: "مشروب تشات صغير",
+    description: "مشروب مبرد بحجم صغير مناسب مع الوجبة",
+    price: 5,
+    image: "photos/مشروب تشات صغير.jpg",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: []
+  },
+  {
+    id: 12,
+    category: "مشروبات",
     name: "مشروب شويبس كبير",
     description: "مشروب شويبس كبير يقدم بارداً",
-    price: 12,
-    image: "photos/مشروب شويبس كبير.webp"
+    price: 10,
+    image: "photos/مشروب شويبس كبير.webp",
+    ingredients: [],
+    removableIngredients: [],
+    freeAddons: [],
+    paidAddons: []
   }
 ];

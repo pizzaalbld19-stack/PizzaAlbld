@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>قائمة بيتسا البلد | بيتسا، باستا، رڤيولي وسلطات</title>
-  <meta name="description" content="استعرض قائمة بيتسا البلد حسب الفئة، وابحث عن البيتسا والباستا والسلطات والمشروبات بسهولة.">
+  <meta name="description" content="استعرض قائمة بيتسا البلد، اختر المكونات والإضافات، واجمع طلبك في سلة عرض للنادل بدون إتمام طلب إلكتروني.">
   <meta name="theme-color" content="#120d0a">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/menu.css">
@@ -28,8 +28,8 @@
   <main class="menu-shell">
     <section class="menu-hero">
       <p class="eyebrow">قائمة الطعام</p>
-      <h1>نكهات مرتبة وواضحة</h1>
-      <p>أضف أو عدل المنتجات من ملف <strong>data/menu.js</strong> وستظهر هنا تلقائياً بدون أي لوحة إدارة.</p>
+      <h1>اختر وجبتك وعدّلها كما تحب</h1>
+      <p>يمكنك إزالة مكونات، إضافة إضافات مجانية أو مدفوعة، وتجميع الاختيارات في سلة عرض فقط لتريها للنادل. تعديل المنتجات يتم يدوياً من ملف <strong>data/menu.js</strong>.</p>
     </section>
 
     <section class="menu-tools" aria-label="البحث والفلترة">
@@ -40,12 +40,64 @@
       <div class="category-tabs" id="categoryTabs" role="tablist" aria-label="فئات القائمة"></div>
     </section>
 
-    <section class="menu-results">
-      <div class="results-meta" id="resultsMeta"></div>
-      <div class="products-grid" id="productsGrid"></div>
-      <p class="empty-state" id="emptyState" hidden>لا توجد منتجات مطابقة للبحث الحالي.</p>
+    <section class="menu-board" aria-label="القائمة والسلة">
+      <div class="menu-results">
+        <div class="results-meta" id="resultsMeta"></div>
+        <div class="products-grid" id="productsGrid"></div>
+        <p class="empty-state" id="emptyState" hidden>لا توجد منتجات مطابقة للبحث الحالي.</p>
+      </div>
+
+      <aside class="cart-panel" aria-label="سلة عرض للنادل">
+        <div class="cart-head">
+          <div>
+            <span class="eyebrow">سلة العرض</span>
+            <h2>اختياراتك</h2>
+          </div>
+          <strong id="cartCount">0</strong>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <p class="empty-cart" id="emptyCart">السلة فارغة حالياً. أضف وجبة لتجميع أفكارك قبل مناداة النادل.</p>
+        <div class="cart-total">
+          <span>المجموع التقريبي</span>
+          <strong id="cartTotal">0 ₪</strong>
+        </div>
+        <button class="clear-cart" id="clearCart" type="button">تفريغ السلة</button>
+        <p class="cart-note">هذه السلة للعرض فقط ولا تقوم بإرسال أو إتمام الطلب.</p>
+      </aside>
     </section>
   </main>
+
+  <div class="customizer" id="customizer" aria-hidden="true">
+    <div class="customizer-dialog" role="dialog" aria-modal="true" aria-labelledby="customizerTitle">
+      <button class="modal-close" id="closeCustomizer" type="button" aria-label="إغلاق">×</button>
+      <div class="customizer-grid">
+        <img id="customizerImage" alt="">
+        <div class="customizer-content">
+          <span class="category-pill" id="customizerCategory"></span>
+          <h2 id="customizerTitle"></h2>
+          <p id="customizerDescription"></p>
+          <div class="customizer-price" id="customizerPrice"></div>
+
+          <div class="option-group" id="ingredientsOptions"></div>
+          <div class="option-group" id="freeAddonOptions"></div>
+          <div class="option-group" id="paidAddonOptions"></div>
+
+          <label class="notes-field">
+            <span>ملاحظات خاصة</span>
+            <textarea id="itemNotes" rows="3" placeholder="مثال: سلطة بدون بصل، صوص على الجنب..."></textarea>
+          </label>
+
+          <div class="modal-actions">
+            <label class="qty-stepper">
+              <span>الكمية</span>
+              <input id="itemQty" type="number" min="1" value="1">
+            </label>
+            <button class="add-cart-btn" id="saveCartItem" type="button">إضافة للسلة</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
