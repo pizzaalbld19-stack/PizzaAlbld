@@ -89,7 +89,7 @@ input {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -97,12 +97,19 @@ input {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  color: #1b1009;
-  background: linear-gradient(135deg, var(--gold), #ffdb7e);
-  box-shadow: 0 10px 28px rgba(242, 184, 75, .25);
+  width: 58px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .2), 0 0 0 1px rgba(242, 184, 75, .18);
+  overflow: hidden;
+}
+
+.brand-mark img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  transform: translateY(1px);
 }
 
 .nav-links {
