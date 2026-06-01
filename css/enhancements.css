@@ -1,0 +1,461 @@
+/* =====================================================================
+   enhancements.css
+   تحسينات احترافية إضافية لموقع بيتسا البلد.
+   هذا الملف يُحمَّل بعد بقية الملفات، لذلك يُستخدم لتوسيع التصميم
+   وتعديله بأمان دون لمس القواعد الأساسية أو كسر أي وظيفة موجودة.
+   ===================================================================== */
+
+/* ---------- 1) تحديث رموز التصميم (Design Tokens) ---------- */
+/* متغيّرات CSS حية: تعديلها هنا يحدّث كل المكوّنات التي تستخدمها. */
+:root {
+  --radius: 14px;        /* زوايا أكثر نعومة وحداثة لكل البطاقات/الأزرار */
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, .28);
+  --ring-gold: 0 0 0 1px rgba(242, 184, 75, .22);
+}
+
+/* تحسين سلوك التمرير العام */
+html {
+  scroll-padding-top: 110px; /* حتى لا يختفي العنوان خلف الهيدر الثابت عند الانتقال بالروابط */
+}
+
+/* ---------- 2) Hero: شارات الثقة + هالة زخرفية ---------- */
+.hero-badges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 0;
+}
+
+.hero-badges li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  background: rgba(255, 255, 255, .04);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero-badges li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+.hero-visual {
+  position: relative;
+}
+
+/* هالة دافئة خلف صورة البيتسا في الواجهة */
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(from 130deg,
+      rgba(242, 184, 75, .20),
+      rgba(216, 70, 47, .16),
+      rgba(242, 184, 75, .08),
+      transparent 62%);
+  filter: blur(34px);
+  animation: heroHalo 16s linear infinite;
+}
+
+@keyframes heroHalo {
+  to { transform: rotate(360deg); }
+}
+
+.hero-visual img {
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .5), var(--ring-gold);
+}
+
+/* ---------- 3) قسم "طريقة الطلب" ---------- */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.step-card {
+  position: relative;
+  padding: 32px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .02));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.step-card::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -32px;
+  top: -32px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 184, 75, .12), transparent 70%);
+}
+
+.step-card .step-num {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  color: #211106;
+  background: linear-gradient(135deg, var(--gold), #ffcf67);
+  font-size: 24px;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(242, 184, 75, .25);
+}
+
+.step-card h3 {
+  font-size: 20px;
+}
+
+.step-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+/* ---------- 4) شريط الدعوة لاتخاذ إجراء (CTA Band) ---------- */
+.cta-band {
+  padding-top: 0 !important;
+}
+
+.cta-inner {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 64px 28px;
+  border: 1px solid rgba(242, 184, 75, .28);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(216, 70, 47, .26), transparent 60%),
+    linear-gradient(160deg, rgba(46, 33, 23, .92), rgba(18, 13, 10, .94));
+  box-shadow: var(--shadow);
+}
+
+.cta-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .015) 0 12px, transparent 12px 24px);
+  pointer-events: none;
+}
+
+.cta-inner h2 {
+  margin: 0;
+}
+
+.cta-inner p {
+  max-width: 580px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.85;
+}
+
+.cta-inner .btn {
+  margin-top: 8px;
+}
+
+/* ---------- 5) صفحة القائمة: تحسين البطاقات ---------- */
+/* وسم صغير يدل على وجود خيارات قابلة للتعديل */
+.product-add::before {
+  content: "+";
+  margin-inline-end: 8px;
+  font-weight: 900;
+}
+
+/* تأثير لطيف عند المرور على بطاقة المنتج (سطح المكتب) */
+@media (hover: hover) {
+  .product-card {
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .product-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(242, 184, 75, .35);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+  }
+}
+
+/* ---------- 6) السلة: أزرار الكمية + زر إتمام الطلب ---------- */
+.cart-item-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.qty-control {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: rgba(255, 255, 255, .04);
+}
+
+.qty-control button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  cursor: pointer;
+  color: var(--text);
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: background .2s ease, color .2s ease;
+}
+
+.qty-control button:hover {
+  background: rgba(242, 184, 75, .16);
+  color: var(--gold);
+}
+
+.qty-control .qty-value {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.cart-item-foot .cart-actions {
+  margin: 0;
+  flex: 1;
+  max-width: 210px;
+}
+
+/* زر إتمام الطلب (أساسي/أخضر) */
+.checkout-btn {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: #082611;
+  background: linear-gradient(135deg, #7eaa54, #a6d96d);
+  box-shadow: 0 14px 34px rgba(126, 170, 84, .3);
+  font-weight: 900;
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.checkout-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.checkout-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* جعل "تفريغ السلة" زرًّا ثانويًّا هادئًا بدل اللون الذهبي القوي */
+.cart-panel .clear-cart {
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.cart-panel .clear-cart:hover:not(:disabled) {
+  color: var(--text);
+  transform: none;
+  filter: none;
+  border-color: rgba(216, 70, 47, .45);
+}
+
+/* ---------- 7) نظام التنبيهات (Toast) — بديل alert ---------- */
+.toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: grid;
+  gap: 10px;
+  width: min(420px, calc(100vw - 28px));
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 13px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(28, 21, 16, .97);
+  color: var(--text);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .42);
+  backdrop-filter: blur(14px);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-success { border-color: rgba(126, 170, 84, .55); }
+.toast-error { border-color: rgba(216, 70, 47, .55); }
+
+/* ---------- 8) القائمة على الهاتف: شبكة مدمجة + شريط فئات ثابت ---------- */
+@media (max-width: 720px) {
+  /* بطاقتان في الصف لاستغلال الشاشة وعرض أصناف أكثر دفعة واحدة */
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  /* إخفاء معاينة الخيارات المطوّلة على الهاتف — تظهر كاملة عند فتح المنتج */
+  .product-card .product-options-preview {
+    display: none;
+  }
+
+  .product-card img {
+    aspect-ratio: 1.1;
+  }
+
+  .product-body {
+    padding: 13px;
+  }
+
+  .category-pill {
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .product-top {
+    margin-bottom: 6px;
+  }
+
+  .product-top h2 {
+    font-size: 16px;
+  }
+
+  .price {
+    font-size: 17px;
+  }
+
+  /* تحديد الوصف لسطرين حتى لا تتفاوت ارتفاعات البطاقات */
+  .product-card p {
+    font-size: 13px;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-add {
+    margin-top: 12px;
+    min-height: 42px;
+    font-size: 14px;
+  }
+
+  /* شريط الأدوات (بحث + فئات) يبقى ثابتًا أعلى الشاشة أثناء التصفح */
+  .menu-page .site-header.solid {
+    position: static;
+  }
+
+  .menu-page .menu-tools {
+    position: sticky;
+    top: 8px;
+    z-index: 30;
+    padding: 12px;
+  }
+
+  /* شريط الفئات يتحول إلى شريط أفقي قابل للسحب بدل الالتفاف */
+  .category-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-tabs button {
+    flex: 0 0 auto;
+  }
+
+  /* السلة كـ Bottom Sheet ممتدة بعرض الشاشة على الهاتف */
+  .cart-panel {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* شاشات صغيرة جدًّا: عمود واحد لتفادي ازدحام النص العربي */
+@media (max-width: 380px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- 9) شريط CTA على الهاتف ---------- */
+@media (max-width: 640px) {
+  .cta-inner {
+    padding: 44px 20px;
+  }
+
+  .toast-stack {
+    bottom: 88px;
+  }
+}
+
+/* نبضة لزر السلة العائم عند كل إضافة جديدة */
+.cart-float.pulse {
+  animation: cartPulse .42s ease;
+}
+
+/* ---------- 10) مؤشر إمكانية تخطّي شاشة التحميل ---------- */
+.loader {
+  cursor: pointer;
+}
+
+/* ---------- 11) احترام تفضيل تقليل الحركة ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-visual::before {
+    animation: none;
+  }
+}

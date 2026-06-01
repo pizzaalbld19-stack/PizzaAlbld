@@ -19,6 +19,8 @@
   const cartBackdrop = document.getElementById("cartBackdrop");
   const cartFloatCount = document.getElementById("cartFloatCount");
   const cartFloatTotal = document.getElementById("cartFloatTotal");
+  const checkoutOrder = document.getElementById("checkoutOrder");
+  const toastStack = document.getElementById("toastStack");
   const customizer = document.getElementById("customizer");
   const closeCustomizer = document.getElementById("closeCustomizer");
   const saveCartItem = document.getElementById("saveCartItem");
@@ -33,6 +35,8 @@
   const paidAddonOptions = document.getElementById("paidAddonOptions");
   const itemNotes = document.getElementById("itemNotes");
   const itemQty = document.getElementById("itemQty");
+
+  const STORAGE_KEY = "pizzaBaladCart";
 
   let activeCategory = "الكل";
   let query = "";
@@ -59,6 +63,8 @@
     "'": "&#39;"
   })[char]);
 
+  const newCartId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
   const getProduct = (id) => menu.find((product) => product.id === Number(id));
 
   const itemAddonTotal = (item) => toArray(item.paidAddons).reduce((sum, addon) => sum + Number(addon.price || 0), 0);
@@ -74,6 +80,63 @@
     toArray(product.freeAddons).length > 0 ||
     toArray(product.paidAddons).length > 0
   );
+
+  /* ---------- حفظ السلة محليًا (تبقى بعد تحديث الصفحة) ---------- */
+  const saveCart = () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    } catch (error) {
+      /* قد يكون التخزين معطّلاً (وضع التصفح الخاص) — نتجاهل بهدوء */
+    }
+  };
+
+  const loadCart = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      // نُبقي فقط العناصر التي ما زال منتجها موجودًا في القائمة الحالية
+      return parsed
+        .filter((item) => item && getProduct(item.productId))
+        .map((item) => ({
+          cartId: item.cartId || newCartId(),
+          productId: Number(item.productId),
+          qty: Math.max(1, Number(item.qty || 1)),
+          removedIngredients: toArray(item.removedIngredients),
+          freeAddons: toArray(item.freeAddons),
+          paidAddons: toArray(item.paidAddons).map((addon) => ({
+            name: addon.name,
+            price: Number(addon.price || 0)
+          })),
+          notes: typeof item.notes === "string" ? item.notes : ""
+        }));
+    } catch (error) {
+      return [];
+    }
+  };
+
+  /* ---------- نظام التنبيهات (بديل alert) ---------- */
+  const showToast = (message, type = "success") => {
+    if (!toastStack) return;
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute("role", "status");
+    toast.textContent = message;
+    toastStack.appendChild(toast);
+    window.requestAnimationFrame(() => toast.classList.add("is-visible"));
+    window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      window.setTimeout(() => toast.remove(), 320);
+    }, 2600);
+  };
+
+  const pulseFloat = () => {
+    if (!cartToggle) return;
+    cartToggle.classList.remove("pulse");
+    void cartToggle.offsetWidth; // إعادة تشغيل الأنيميشن
+    cartToggle.classList.add("pulse");
+  };
 
   const createChips = (items, emptyText) => {
     if (!toArray(items).length) return `<p class="muted-line">${escapeHTML(emptyText)}</p>`;
@@ -124,6 +187,8 @@
         activeCategory = category;
         renderTabs();
         renderProducts();
+        // إبقاء الفئة المختارة ظاهرة داخل الشريط الأفقي على الهاتف
+        button.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       });
       fragment.appendChild(button);
     });
@@ -261,11 +326,43 @@
     cartBackdrop.setAttribute("aria-hidden", "true");
   };
 
+  /* إضافة مباشرة للمنتجات التي لا تحتوي خيارات (مثل المشروبات) */
+  const addSimpleProduct = (product) => {
+    const existing = cart.find((item) =>
+      item.productId === product.id &&
+      !item.removedIngredients.length &&
+      !item.freeAddons.length &&
+      !item.paidAddons.length &&
+      !item.notes
+    );
+
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({
+        cartId: newCartId(),
+        productId: product.id,
+        qty: 1,
+        removedIngredients: [],
+        freeAddons: [],
+        paidAddons: [],
+        notes: ""
+      });
+    }
+
+    renderCart();
+    pulseFloat();
+    showToast(`تمت إضافة ${product.name} إلى السلة.`);
+  };
+
   const saveItem = () => {
     if (!activeProduct) return;
 
+    const productName = activeProduct.name;
+    const isEditing = Boolean(editingCartId);
+
     const item = {
-      cartId: editingCartId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      cartId: editingCartId || newCartId(),
       productId: activeProduct.id,
       qty: Math.max(1, Number(itemQty.value || 1)),
       removedIngredients: checkedValues("removedIngredients"),
@@ -274,7 +371,7 @@
       notes: itemNotes.value.trim()
     };
 
-    if (editingCartId) {
+    if (isEditing) {
       cart = cart.map((cartItem) => cartItem.cartId === editingCartId ? item : cartItem);
     } else {
       cart.push(item);
@@ -282,6 +379,8 @@
 
     renderCart();
     closeModal();
+    if (!isEditing) pulseFloat();
+    showToast(isEditing ? "تم تحديث الصنف." : `تمت إضافة ${productName} إلى السلة.`);
   };
 
   const renderItemDetails = (item) => {
@@ -310,14 +409,21 @@
         <div class="cart-item-top">
           <div>
             <h3>${escapeHTML(product.name)}</h3>
-            <span>${escapeHTML(formatPrice(product.price))} × ${escapeHTML(item.qty)}</span>
+            <span>${escapeHTML(formatPrice(product.price))} للوحدة</span>
           </div>
           <strong>${escapeHTML(formatPrice(itemTotal(item)))}</strong>
         </div>
         <div class="cart-item-details">${renderItemDetails(item)}</div>
-        <div class="cart-actions">
-          <button type="button" data-edit-id="${escapeHTML(item.cartId)}">تعديل</button>
-          <button type="button" data-remove-id="${escapeHTML(item.cartId)}">إزالة</button>
+        <div class="cart-item-foot">
+          <div class="qty-control">
+            <button type="button" data-dec-id="${escapeHTML(item.cartId)}" aria-label="إنقاص الكمية">−</button>
+            <span class="qty-value">${escapeHTML(item.qty)}</span>
+            <button type="button" data-inc-id="${escapeHTML(item.cartId)}" aria-label="زيادة الكمية">+</button>
+          </div>
+          <div class="cart-actions">
+            <button type="button" data-edit-id="${escapeHTML(item.cartId)}">تعديل</button>
+            <button type="button" data-remove-id="${escapeHTML(item.cartId)}">إزالة</button>
+          </div>
         </div>
       `;
       fragment.appendChild(row);
@@ -331,18 +437,70 @@
     cartToggle.classList.toggle("has-items", count > 0);
     emptyCart.hidden = cart.length > 0;
     clearCart.disabled = cart.length === 0;
+    if (checkoutOrder) checkoutOrder.disabled = cart.length === 0;
+
+    saveCart();
+  };
+
+  const changeQty = (cartId, delta) => {
+    const item = cart.find((cartItem) => cartItem.cartId === cartId);
+    if (!item) return;
+    item.qty = Math.max(1, Number(item.qty || 1) + delta);
+    renderCart();
+  };
+
+  /* ---------- إتمام الطلب عبر واتساب ---------- */
+  const buildOrderText = () => {
+    const lines = ["طلب جديد من بيتسا البلد:", ""];
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      const product = getProduct(item.productId);
+      if (!product) return;
+      total += itemTotal(item);
+      lines.push(`${index + 1}) ${product.name} × ${item.qty} — ${formatPrice(itemTotal(item))}`);
+      if (item.removedIngredients.length) lines.push(`   بدون: ${item.removedIngredients.join("، ")}`);
+      if (item.freeAddons.length) lines.push(`   إضافات مجانية: ${item.freeAddons.join("، ")}`);
+      if (item.paidAddons.length) lines.push(`   إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} (+${formatPrice(addon.price)})`).join("، ")}`);
+      if (item.notes) lines.push(`   ملاحظة: ${item.notes}`);
+    });
+
+    lines.push("", `المجموع التقريبي: ${formatPrice(total)}`);
+    return lines.join("\n");
+  };
+
+  const checkout = () => {
+    if (!cart.length) {
+      showToast("السلة فارغة، أضف أصنافاً أولاً.", "error");
+      return;
+    }
+    const text = encodeURIComponent(buildOrderText());
+    const whatsapp = site.phone?.whatsapp;
+    if (whatsapp) {
+      window.open(`https://wa.me/${whatsapp}?text=${text}`, "_blank", "noopener");
+      showToast("تم تجهيز طلبك، أكمل الإرسال عبر واتساب.");
+    } else {
+      showToast("تم تجهيز ملخص الطلب.");
+    }
   };
 
   grid.addEventListener("click", (event) => {
     const button = event.target.closest("[data-product-id]");
     if (!button) return;
     const product = getProduct(button.dataset.productId);
-    if (product) openCustomizer(product);
+    if (!product) return;
+    if (productHasOptions(product)) {
+      openCustomizer(product);
+    } else {
+      addSimpleProduct(product);
+    }
   });
 
   cartItems.addEventListener("click", (event) => {
     const editButton = event.target.closest("[data-edit-id]");
     const removeButton = event.target.closest("[data-remove-id]");
+    const incButton = event.target.closest("[data-inc-id]");
+    const decButton = event.target.closest("[data-dec-id]");
 
     if (editButton) {
       const item = cart.find((cartItem) => cartItem.cartId === editButton.dataset.editId);
@@ -353,7 +511,11 @@
     if (removeButton) {
       cart = cart.filter((cartItem) => cartItem.cartId !== removeButton.dataset.removeId);
       renderCart();
+      showToast("تمت إزالة الصنف من السلة.");
     }
+
+    if (incButton) changeQty(incButton.dataset.incId, 1);
+    if (decButton) changeQty(decButton.dataset.decId, -1);
   });
 
   search.addEventListener("input", (event) => {
@@ -362,9 +524,13 @@
   });
 
   clearCart.addEventListener("click", () => {
+    if (!cart.length) return;
     cart = [];
     renderCart();
+    showToast("تم تفريغ السلة.");
   });
+
+  if (checkoutOrder) checkoutOrder.addEventListener("click", checkout);
 
   cartToggle.addEventListener("click", openCart);
   cartClose.addEventListener("click", closeCart);
@@ -380,6 +546,7 @@
     if (event.key === "Escape" && cartPanel.classList.contains("is-open")) closeCart();
   });
 
+  cart = loadCart();
   renderTabs();
   renderProducts();
   renderCart();

@@ -16,6 +16,16 @@
     window.addEventListener("load", () => {
       window.setTimeout(revealPage, 4550);
     });
+    // السماح بتخطّي شاشة التحميل بالنقر/اللمس أو بمفتاح الإدخال
+    if (loader) {
+      loader.addEventListener("click", revealPage);
+      loader.setAttribute("role", "button");
+      loader.setAttribute("tabindex", "0");
+      loader.setAttribute("title", "اضغط للتخطّي");
+      loader.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") revealPage();
+      });
+    }
   }
 
   const revealObserver = new IntersectionObserver((entries) => {
