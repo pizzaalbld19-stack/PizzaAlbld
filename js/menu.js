@@ -36,6 +36,13 @@
   const itemNotes = document.getElementById("itemNotes");
   const itemQty = document.getElementById("itemQty");
 
+  const categoryCards = document.getElementById("categoryCards");
+  const scrollToCats = document.getElementById("scrollToCats");
+  const navMenu = document.getElementById("navMenu");
+  const menuShell = document.querySelector(".menu-shell");
+  const backToCats = document.getElementById("backToCats");
+  const activeCategoryTitle = document.getElementById("activeCategoryTitle");
+
   const STORAGE_KEY = "pizzaBaladCart";
 
   let activeCategory = "الكل";
@@ -218,6 +225,65 @@
     grid.replaceChildren(fragment);
     empty.hidden = products.length > 0;
     meta.textContent = `تم عرض ${products.length} من ${menu.length} منتج`;
+  };
+
+  /* ---------- بطاقات الفئات (شاشة اختيار الفئة بأسلوب التطبيق) ---------- */
+  const categoryMeta = {
+    "بيتسا": "بيتسا طازجة من الفرن بعجينة مخمّرة",
+    "باستا": "باستا إيطالية بصوصات كريمية غنية",
+    "رڤيولي": "رڤيولي محشو يقدّم ساخناً بصوص غني",
+    "سلطات": "سلطات منعشة بخضار ومكوّنات طازجة",
+    "مشروبات": "مشروبات باردة تكمل وجبتك"
+  };
+
+  const categoryImage = (category) => {
+    const product = menu.find((item) => item.category === category);
+    return product ? product.image : "";
+  };
+
+  const CC_SLICE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c4.4 0 8.3 2.4 9 5.8L12 21 3 8.8C3.7 5.4 7.6 3 12 3Z"/><circle cx="9.5" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="13.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`;
+  const CC_CHEVRON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>`;
+
+  /* التنقّل بين شاشة الفئات وشاشة منتجات الفئة (Drill-down) */
+  const showCategories = () => {
+    if (menuShell) menuShell.dataset.view = "categories";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const showProducts = (category) => {
+    activeCategory = category;
+    renderTabs();
+    renderProducts();
+    if (activeCategoryTitle) activeCategoryTitle.textContent = category;
+    if (menuShell) menuShell.dataset.view = "products";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const renderCategoryCards = () => {
+    if (!categoryCards) return;
+    const cats = categories.filter((category) => category !== "الكل");
+    const fragment = document.createDocumentFragment();
+
+    cats.forEach((category, index) => {
+      const count = menu.filter((product) => product.category === category).length;
+      if (!count) return;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "category-card";
+      card.style.animationDelay = `${Math.min(index * 70, 420)}ms`;
+      card.innerHTML = `
+        <span class="cc-img"><img src="${escapeHTML(categoryImage(category))}" alt="" loading="lazy"></span>
+        <span class="cc-text">
+          <strong>${escapeHTML(category)}</strong>
+          <span>${escapeHTML(categoryMeta[category] || `${count} أصناف`)}</span>
+        </span>
+        <span class="cc-go"><span class="cc-badge">${CC_SLICE_ICON}</span>${CC_CHEVRON}</span>
+      `;
+      card.addEventListener("click", () => showProducts(category));
+      fragment.appendChild(card);
+    });
+
+    categoryCards.replaceChildren(fragment);
   };
 
   const createCheckbox = ({ name, value, checked = false, price = null, group }) => `
@@ -536,6 +602,15 @@
   cartClose.addEventListener("click", closeCart);
   cartBackdrop.addEventListener("click", closeCart);
 
+  if (scrollToCats) {
+    scrollToCats.addEventListener("click", () => {
+      if (categoryCards) categoryCards.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  if (backToCats) backToCats.addEventListener("click", showCategories);
+  if (navMenu) navMenu.addEventListener("click", showCategories);
+
   closeCustomizer.addEventListener("click", closeModal);
   saveCartItem.addEventListener("click", saveItem);
   customizer.addEventListener("click", (event) => {
@@ -547,6 +622,7 @@
   });
 
   cart = loadCart();
+  renderCategoryCards();
   renderTabs();
   renderProducts();
   renderCart();

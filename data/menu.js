@@ -3,7 +3,7 @@ window.PIZZA_BALAD_MENU = [
     id: 1,
     category: "بيتسا",
     name: "بيتسا حجم عائلي",
-    description: "بيتسا كبيرة مناسبة للمشاركة مع جبنة موزاريلا وصوص البيت الخاص",
+    description: [],
     price: 60,
     image: "photos/بيتسا حجم عائلي.jpg",
     ingredients: ["صلصة طماطم", "جبنة"],
@@ -44,13 +44,10 @@ window.PIZZA_BALAD_MENU = [
     description: "باستا بصوص روزيه كريمي متوازن مع لمسة طماطم غنية",
     price: 35,
     image: "photos/باستا روزيه.jpg",
-    ingredients: [],
-    removableIngredients: [],
+    ingredients: [  "جبنة موتزاريلا" ],
+    removableIngredients: ["جبنة موتزاريلا" ],
     freeAddons: [],
-    paidAddons: [
-      { name: "جبنة موتزاريلا", price: 5 },
-      { name: "جبنة بارميزان", price: 5 }
-    ]
+    paidAddons: []
   },
   {
     id: 4,
@@ -59,13 +56,10 @@ window.PIZZA_BALAD_MENU = [
     description: "باستا مخبوزة بصوص باشاميل ناعم وطبقة ذهبية شهية",
     price: 35,
     image: "photos/باستا باشاميل.jpg",
-    ingredients: [],
-    removableIngredients: [],
+    ingredients: ["جبنة موتزاريلا" ],
+    removableIngredients: ["جبنة موتزاريلا" ],
     freeAddons: [],
-    paidAddons: [
-      { name: "جبنة موتزاريلا", price: 5 },
-      { name: "جبنة بارميزان", price: 5 }
-    ]
+    paidAddons: []
   },
   {
     id: 5,
@@ -78,8 +72,8 @@ window.PIZZA_BALAD_MENU = [
     removableIngredients: [],
     freeAddons: [],
     paidAddons: [
-      { name: "موتزاريلا", price: 5 },
-      { name: "جبنة بارميزان", price: 5 }
+      { name: "موتزاريلا", price: 5 }
+      
     ]
   },
   {
@@ -93,8 +87,7 @@ window.PIZZA_BALAD_MENU = [
     removableIngredients: [],
     freeAddons: [],
     paidAddons: [
-      { name: "موتزاريلا", price: 5 },
-      { name: "جبنة بارميزان", price: 5 }
+      { name: "موتزاريلا", price: 5 }
     ]
   },
   {
@@ -108,8 +101,7 @@ window.PIZZA_BALAD_MENU = [
     removableIngredients: [],
     freeAddons: [],
     paidAddons: [
-      { name: "موتزاريلا", price: 5 },
-      { name: "جبنة بارميزان", price: 5 }
+      { name: "موتزاريلا", price: 5 }
     ]
   },
   {

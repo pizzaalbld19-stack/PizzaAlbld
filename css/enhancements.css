@@ -459,3 +459,533 @@ html {
     animation: none;
   }
 }
+
+/* =====================================================================
+   12) الهوية الفاخرة: خطوط عربية أنيقة + ملمس + لمسات ذهبية
+   ===================================================================== */
+
+/* خطوط عربية: El Messiri للعناوين (أنيق ومميّز)، Cairo للنص (واضح ومريح) */
+:root {
+  --font-body: "Cairo", Tahoma, Arial, sans-serif;
+  --font-display: "El Messiri", "Cairo", Tahoma, serif;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* العناوين والعلامة بالخط الأنيق — مع line-height مريح لحروف العربية */
+h1,
+h2,
+h3,
+.brand span,
+.cart-head h2,
+.customizer-content h2,
+.step-card h3,
+.loader-brand strong,
+.cart-float-title {
+  font-family: var(--font-display);
+}
+
+h1 { line-height: 1.05; }
+h2 { line-height: 1.2; }
+.product-top h2 { line-height: 1.3; }
+
+/* تدرّج ذهبي فاخر على العناوين الكبرى فقط (تبقى أسماء الأصناف كريمية للوضوح) */
+.hero h1,
+.section-heading h2,
+.cta-inner h2,
+.menu-hero h1 {
+  color: var(--gold);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero h1,
+  .section-heading h2,
+  .cta-inner h2,
+  .menu-hero h1 {
+    background-image: linear-gradient(100deg, #ffe9b0 0%, var(--gold) 46%, #c8862f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+/* خلفية داكنة أعمق + توهّج دافئ + ملمس حبيبي خفيف جدًّا (Film Grain) */
+body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E") repeat,
+    radial-gradient(circle at 82% -4%, rgba(216, 70, 47, .20), transparent 30rem),
+    radial-gradient(circle at 6% 6%, rgba(242, 184, 75, .12), transparent 26rem),
+    linear-gradient(180deg, #0e0a07 0%, #15100b 50%, #0c0806 100%);
+}
+
+.menu-page {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E") repeat,
+    radial-gradient(circle at 80% -2%, rgba(242, 184, 75, .12), transparent 26rem),
+    linear-gradient(180deg, #0e0a07, #15100b 54%, #0c0806);
+}
+
+/* خط ذهبي رفيع أسفل الهيدر يمنحه لمسة راقية */
+.site-header {
+  position: fixed; /* محفوظ كما هو في الأصل، نضيف فقط الخط الذهبي */
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 184, 75, .5), transparent);
+  pointer-events: none;
+}
+
+/* توهّج ذهبي أقوى وأنعم على زر الإجراء الأساسي */
+.btn-primary {
+  box-shadow:
+    0 16px 42px rgba(242, 184, 75, .3),
+    inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
+.btn-primary:hover {
+  box-shadow:
+    0 22px 56px rgba(242, 184, 75, .42),
+    inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+
+/* تباعد أكبر وانسيابية أنعم بين الأقسام لإحساس فاخر */
+@media (min-width: 981px) {
+  section:not(.hero) {
+    padding: 104px 0;
+  }
+}
+
+/* =====================================================================
+   13) واجهة المنيو بأسلوب التطبيق: ترويسة علامة + بطاقات فئات + شريط سفلي
+   ===================================================================== */
+
+/* إخفاء الهيدر العلوي في صفحة المنيو لإعطاء إحساس "التطبيق" (التنقل يتم عبر الشريط السفلي) */
+.menu-page .site-header {
+  display: none;
+}
+
+/* تثبيت شريط الأدوات قرب الأعلى بعد إخفاء الهيدر */
+.menu-page .menu-tools {
+  position: sticky;
+  top: 10px;
+  z-index: 30;
+}
+
+/* مساحة سفلية كافية حتى لا يغطي الشريط السفلي المحتوى/الفوتر */
+.menu-shell {
+  padding-bottom: 124px;
+}
+
+.menu-page .site-footer {
+  margin-bottom: 96px;
+}
+
+/* ---------- ترويسة العلامة ---------- */
+.menu-hero-brand {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 30px 16px 20px;
+  overflow: hidden;
+}
+
+.menu-hero-brand::before,
+.menu-hero-brand::after {
+  content: "";
+  position: absolute;
+  top: -46px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(6px);
+}
+
+.menu-hero-brand::before {
+  inset-inline-start: -36px;
+  background: radial-gradient(circle, rgba(242, 184, 75, .18), transparent 70%);
+}
+
+.menu-hero-brand::after {
+  inset-inline-end: -36px;
+  background: radial-gradient(circle, rgba(216, 70, 47, .22), transparent 70%);
+}
+
+.mhb-logo {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, .55));
+}
+
+.mhb-welcome {
+  margin: 6px 0 0;
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.mhb-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 9vw, 46px);
+  line-height: 1.15;
+}
+
+.mhb-title span {
+  color: var(--gold);
+}
+
+.mhb-choose {
+  margin-top: 14px;
+  min-height: 46px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 900;
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--tomato), #b5371f);
+  box-shadow: 0 14px 30px rgba(216, 70, 47, .35);
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.mhb-choose:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+/* ---------- بطاقات الفئات ---------- */
+.category-cards {
+  display: grid;
+  gap: 12px;
+  padding: 6px 0 16px;
+}
+
+.category-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: start;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(216, 70, 47, .14), transparent 55%),
+    linear-gradient(135deg, rgba(46, 33, 23, .78), rgba(18, 12, 8, .9));
+  box-shadow: var(--shadow-soft);
+  animation: productIn .5s ease both;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(242, 184, 75, .42);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, .42);
+}
+
+.category-card:active {
+  transform: translateY(-1px) scale(.995);
+}
+
+.cc-img {
+  flex: 0 0 auto;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(242, 184, 75, .32);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .45);
+}
+
+.cc-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cc-text strong {
+  font-family: var(--font-display);
+  font-size: 19px;
+}
+
+.cc-text span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cc-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-badge {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(242, 184, 75, .35);
+  background: rgba(216, 70, 47, .15);
+  color: var(--tomato);
+}
+
+.cc-badge svg {
+  width: 22px;
+  height: 22px;
+}
+
+.cc-go > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+/* ---------- شريط التنقّل السفلي ---------- */
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 70;
+  width: 100%;
+  max-width: 560px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  gap: 4px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(28, 21, 16, .92), rgba(12, 9, 6, .98));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, .45);
+  backdrop-filter: blur(18px);
+  transform: translateX(-50%);
+}
+
+.bottom-nav-item {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  text-decoration: none;
+  transition: color .2s ease, transform .2s ease;
+}
+
+.bottom-nav-item:hover {
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bottom-nav-cart {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-body);
+  transform: translateY(-14px);
+}
+
+.bottom-nav-cart strong {
+  display: none;
+}
+
+.cart-fab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, var(--tomato), #b5371f);
+  box-shadow: 0 12px 30px rgba(216, 70, 47, .45), 0 0 0 5px rgba(12, 9, 6, .92);
+  transition: box-shadow .2s ease;
+}
+
+.cart-fab svg {
+  width: 26px;
+  height: 26px;
+}
+
+.bottom-nav-cart .cart-float-count {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #211106;
+  font-size: 12px;
+  font-weight: 900;
+  border: 2px solid #0e0a07;
+}
+
+.bottom-nav-cart.has-items .cart-fab {
+  box-shadow: 0 14px 36px rgba(216, 70, 47, .62), 0 0 0 5px rgba(12, 9, 6, .92);
+}
+
+.bottom-nav-cart.pulse {
+  animation: navCartPulse .5s ease;
+}
+
+@keyframes navCartPulse {
+  0% { transform: translateY(-14px) scale(1); }
+  45% { transform: translateY(-19px) scale(1.08); }
+  100% { transform: translateY(-14px) scale(1); }
+}
+
+/* رفع السلة المنبثقة فوق الشريط السفلي على جميع المقاسات */
+.menu-page .cart-panel {
+  bottom: 96px;
+}
+
+/* عرض بطاقات الفئات كشبكة على الشاشات الأكبر لاستغلال المساحة */
+@media (min-width: 721px) {
+  .category-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .menu-hero-brand {
+    padding-top: 46px;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 980px) {
+  .menu-page .cart-panel {
+    inset: auto 12px 96px 12px;
+    width: auto;
+  }
+}
+
+/* =====================================================================
+   14) تنقّل المنيو من مستويين: شاشة الفئات ↔ شاشة منتجات الفئة
+   ===================================================================== */
+
+/* إظهار شاشة واحدة فقط في كل مرة حسب حالة data-view */
+.menu-shell[data-view="categories"] .products-view {
+  display: none;
+}
+
+.menu-shell[data-view="products"] .categories-view {
+  display: none;
+}
+
+/* إخفاء شريط الفئات القديم نهائيًا — البطاقات تقوم بدوره (إزالة التكرار) */
+.menu-page .category-tabs {
+  display: none;
+}
+
+/* شريط الأدوات أصبح حاوية بسيطة لمربع البحث فقط (غير ثابت) */
+.menu-page .menu-tools {
+  position: static;
+  top: auto;
+  display: block;
+  padding: 0;
+  margin-bottom: 14px;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.menu-page .menu-tools .search-box {
+  display: block;
+}
+
+/* رأس شاشة المنتجات: زر العودة + اسم الفئة (ثابت أعلى الشاشة) */
+.products-head {
+  position: sticky;
+  top: 8px;
+  z-index: 31;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(18, 13, 10, .92);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-soft);
+}
+
+.back-to-cats {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(242, 184, 75, .32);
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--gold);
+  background: rgba(242, 184, 75, .08);
+  font-weight: 800;
+  font-family: var(--font-body);
+  transition: background .2s ease;
+}
+
+.back-to-cats:hover {
+  background: rgba(242, 184, 75, .16);
+}
+
+.back-to-cats svg {
+  width: 18px;
+  height: 18px;
+}
+
+.products-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold);
+}
