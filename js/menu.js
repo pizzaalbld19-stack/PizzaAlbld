@@ -24,6 +24,9 @@
   const customizer = document.getElementById("customizer");
   const closeCustomizer = document.getElementById("closeCustomizer");
   const saveCartItem = document.getElementById("saveCartItem");
+  const pizzaSplitModal = document.getElementById("pizzaSplitModal");
+  const pizzaSplitClose = document.getElementById("pizzaSplitClose");
+  const pizzaSplitContent = document.getElementById("pizzaSplitContent");
 
   const customizerImage = document.getElementById("customizerImage");
   const customizerCategory = document.getElementById("customizerCategory");
@@ -50,6 +53,8 @@
   let cart = [];
   let activeProduct = null;
   let editingCartId = null;
+  let pizzaSplit = null;
+  let pizzaSliceSheet = null;
 
   if (year) year.textContent = new Date().getFullYear();
 
@@ -62,6 +67,7 @@
   const formatPrice = (price) => `${price} ₪`;
   const normalize = (value) => String(value || "").trim().toLowerCase();
   const toArray = (value) => Array.isArray(value) ? value : [];
+  const uniqueValues = (values) => [...new Set(toArray(values).map((value) => String(value || "").trim()).filter(Boolean))];
   const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
@@ -73,8 +79,12 @@
   const newCartId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
   const getProduct = (id) => menu.find((product) => product.id === Number(id));
+  const isPizzaProduct = (product) => normalize(product?.category) === normalize("بيتسا");
 
-  const itemAddonTotal = (item) => toArray(item.paidAddons).reduce((sum, addon) => sum + Number(addon.price || 0), 0);
+  const itemAddonTotal = (item) => {
+    if (item.splitMode === "slices") return Number(item.sliceAddonsCost || 0);
+    return toArray(item.paidAddons).reduce((sum, addon) => sum + Number(addon.price || 0), 0);
+  };
 
   const itemTotal = (item) => {
     const product = getProduct(item.productId);
@@ -116,7 +126,15 @@
             name: addon.name,
             price: Number(addon.price || 0)
           })),
-          notes: typeof item.notes === "string" ? item.notes : ""
+          notes: typeof item.notes === "string" ? item.notes : "",
+          splitMode: item.splitMode === "slices" ? "slices" : null,
+          pizzaSplitMode: item.pizzaSplitMode || (item.splitMode === "slices" ? "slices" : null),
+          sliceCount: Number(item.sliceCount || 0),
+          pizzaSections: toArray(item.pizzaSections),
+          pizzaAdditions: item.pizzaAdditions || null,
+          additionsText: toArray(item.additionsText),
+          sliceSummary: toArray(item.sliceSummary),
+          sliceAddonsCost: Number(item.sliceAddonsCost || 0)
         }));
     } catch (error) {
       return [];
@@ -152,7 +170,10 @@
 
   const createProductCard = (product, index) => {
     const card = document.createElement("article");
-    card.className = "product-card";
+    card.className = "product-card product-row";
+    card.dataset.productId = product.id;
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
     card.style.animationDelay = `${Math.min(index * 45, 360)}ms`;
     const freeAddons = toArray(product.freeAddons);
     const paidAddons = toArray(product.paidAddons);
@@ -320,6 +341,472 @@
     `;
   };
 
+  const PIZZA_SLICE_COUNTS = [4, 8, 10, 12, 16];
+  const PIZZA_DEFAULT_SLICE_COUNT = 8;
+  const PIZZA_COLORS = ["#f7b84b", "#d9472f", "#2f9f72", "#9f6bff", "#f97316", "#38bdf8", "#ef5da8", "#84cc16"];
+  const PIZZA_EMOJI = [
+    { words: ["زيتون"], mark: "●" },
+    { words: ["ذرة"], mark: "●" },
+    { words: ["فلفل"], mark: "●" },
+    { words: ["فقع", "فطر"], mark: "●" },
+    { words: ["طماطم"], mark: "●" },
+    { words: ["بصل"], mark: "●" },
+    { words: ["تونة"], mark: "●" },
+    { words: ["جبنة", "جبن"], mark: "●" }
+  ];
+
+  const pizzaDescriptorKey = (descriptor) => `${descriptor.scope}:${descriptor.name}`;
+  const pizzaDescriptorColor = (descriptor, index = 0) => descriptor.scope === "removable"
+    ? "#f43f5e"
+    : PIZZA_COLORS[index % PIZZA_COLORS.length];
+  const pizzaDescriptorMark = (name) => {
+    const text = normalize(name);
+    const item = PIZZA_EMOJI.find((entry) => entry.words.some((word) => text.includes(normalize(word))));
+    return item?.mark || "●";
+  };
+
+  const buildSlicePath = (sliceIndex, sliceCount, radius = 122, cx = 150, cy = 150) => {
+    const sliceDeg = 360 / sliceCount;
+    const startDeg = sliceIndex * sliceDeg - 90;
+    const endDeg = startDeg + sliceDeg;
+    const start = (startDeg * Math.PI) / 180;
+    const end = (endDeg * Math.PI) / 180;
+    const x1 = cx + radius * Math.cos(start);
+    const y1 = cy + radius * Math.sin(start);
+    const x2 = cx + radius * Math.cos(end);
+    const y2 = cy + radius * Math.sin(end);
+    const largeArc = sliceDeg > 180 ? 1 : 0;
+    return `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+  };
+
+  const sliceCentroid = (sliceIndex, sliceCount, radius = 72, cx = 150, cy = 150) => {
+    const sliceDeg = 360 / sliceCount;
+    const midDeg = sliceIndex * sliceDeg - 90 + sliceDeg / 2;
+    const mid = (midDeg * Math.PI) / 180;
+    return { x: cx + radius * Math.cos(mid), y: cy + radius * Math.sin(mid) };
+  };
+
+  const clampSliceSelections = (map, nextCount) => {
+    map.forEach((set, key) => {
+      const trimmed = new Set();
+      set.forEach((sliceIndex) => {
+        if (sliceIndex < nextCount) trimmed.add(sliceIndex);
+      });
+      map.set(key, trimmed);
+    });
+  };
+
+  const getPizzaSliceDefinition = (sliceIndex) => ({
+    key: `slice-${sliceIndex + 1}`,
+    label: `الشريحة ${sliceIndex + 1}`
+  });
+
+  const buildPizzaAdditionsTextFromSections = (sections) => {
+    const list = toArray(sections);
+    const additionsText = [`تقسيم المنتج: شرائح (${list.length} شرائح)`];
+    const groups = [];
+
+    list.forEach((section, index) => {
+      const sigKey = JSON.stringify({
+        f: [...toArray(section.freeAdditions)].sort(),
+        p: [...toArray(section.paidAdditions)].sort(),
+        r: [...toArray(section.removedIngredients)].sort()
+      });
+      if (groups.length && groups[groups.length - 1].sigKey === sigKey) {
+        groups[groups.length - 1].end = index + 1;
+      } else {
+        groups.push({ sigKey, start: index + 1, end: index + 1, section });
+      }
+    });
+
+    groups.forEach(({ start, end, section }) => {
+      const parts = [];
+      if (toArray(section.freeAdditions).length) parts.push(`مجانية: ${section.freeAdditions.join("، ")}`);
+      if (toArray(section.paidAdditions).length) parts.push(`مدفوعة: ${section.paidAdditions.join("، ")}`);
+      if (toArray(section.removedIngredients).length) parts.push(`بدون: ${section.removedIngredients.join("، ")}`);
+      const label = start === end ? `الشريحة ${start}` : `الشرائح ${start}–${end}`;
+      additionsText.push(`${label}: ${parts.length ? parts.join(" | ") : "بدون تعديلات"}`);
+    });
+
+    const uniquePaid = uniqueValues(list.flatMap((section) => section.paidAdditions || []));
+    if (uniquePaid.length) additionsText.push(`الإضافات المدفوعة المحتسبة: ${uniquePaid.join("، ")}`);
+
+    return additionsText;
+  };
+
+  const getFlatPizzaAdditionsFromSections = (sections) => ({
+    freeAdditions: uniqueValues(toArray(sections).flatMap((section) => section.freeAdditions || [])),
+    paidAdditions: uniqueValues(toArray(sections).flatMap((section) => section.paidAdditions || []))
+  });
+
+  const getPizzaDescriptors = (product) => [
+    ...toArray(product.freeAddons).map((name, index) => ({
+      scope: "free",
+      name,
+      price: 0,
+      color: pizzaDescriptorColor({ scope: "free", name }, index)
+    })),
+    ...toArray(product.paidAddons).map((addon, index) => ({
+      scope: "paid",
+      name: addon.name,
+      price: Number(addon.price || 0),
+      color: pizzaDescriptorColor({ scope: "paid", name: addon.name }, index + toArray(product.freeAddons).length)
+    })),
+    ...toArray(product.removableIngredients || product.ingredients).map((name) => ({
+      scope: "removable",
+      name,
+      price: 0,
+      color: pizzaDescriptorColor({ scope: "removable", name })
+    }))
+  ];
+
+  const computePizzaSplitPrice = () => {
+    if (!pizzaSplit) return { addons: 0, unit: 0, total: 0 };
+    let addons = 0;
+    pizzaSplit.descriptors.forEach((descriptor) => {
+      if (descriptor.scope !== "paid") return;
+      const selected = pizzaSplit.selections.get(pizzaDescriptorKey(descriptor));
+      if (!selected?.size) return;
+      addons += Number(descriptor.price || 0);
+    });
+    addons = Number(addons.toFixed(2));
+    const unit = Number((Number(pizzaSplit.product.price || 0) + addons).toFixed(2));
+    return { addons, unit, total: Number((unit * pizzaSplit.qty).toFixed(2)) };
+  };
+
+  const hydratePizzaSelections = (product, cartItem) => {
+    const descriptors = getPizzaDescriptors(product);
+    const selections = new Map(descriptors.map((descriptor) => [pizzaDescriptorKey(descriptor), new Set()]));
+    const sections = toArray(cartItem?.pizzaSections);
+    const sliceCount = PIZZA_SLICE_COUNTS.includes(sections.length) ? sections.length : PIZZA_DEFAULT_SLICE_COUNT;
+
+    sections.forEach((section, sliceIndex) => {
+      if (sliceIndex >= sliceCount) return;
+      descriptors.forEach((descriptor) => {
+        const key = pizzaDescriptorKey(descriptor);
+        const source = descriptor.scope === "free"
+          ? section.freeAdditions
+          : descriptor.scope === "paid"
+            ? section.paidAdditions
+            : section.removedIngredients;
+        if (toArray(source).includes(descriptor.name)) selections.get(key).add(sliceIndex);
+      });
+    });
+
+    return { descriptors, selections, sliceCount };
+  };
+
+  const openPizzaSplit = (product, cartItem = null) => {
+    const hydrated = hydratePizzaSelections(product, cartItem);
+    pizzaSplit = {
+      product,
+      descriptors: hydrated.descriptors,
+      selections: hydrated.selections,
+      sliceCount: hydrated.sliceCount,
+      qty: Math.max(1, Number(cartItem?.qty || 1)),
+      notes: cartItem?.notes || "",
+      editingCartId: cartItem?.cartId || null
+    };
+    renderPizzaSplit();
+    pizzaSplitModal.classList.add("is-open");
+    pizzaSplitModal.setAttribute("aria-hidden", "false");
+  };
+
+  const closePizzaSplit = () => {
+    closePizzaSliceSheet();
+    pizzaSplitModal.classList.remove("is-open");
+    pizzaSplitModal.setAttribute("aria-hidden", "true");
+    pizzaSplit = null;
+  };
+
+  const countPizzaSlices = (descriptor) => pizzaSplit?.selections.get(pizzaDescriptorKey(descriptor))?.size || 0;
+
+  const renderPizzaPreview = () => {
+    const slices = Array.from({ length: pizzaSplit.sliceCount }, (_, sliceIndex) => {
+      const activeDescriptors = pizzaSplit.descriptors.filter((descriptor) => pizzaSplit.selections.get(pizzaDescriptorKey(descriptor))?.has(sliceIndex));
+      const centroid = sliceCentroid(sliceIndex, pizzaSplit.sliceCount);
+      const first = activeDescriptors[0];
+      const fill = first ? `${first.color}66` : "rgba(248, 183, 75, .22)";
+      const marks = activeDescriptors.slice(0, 4).map((descriptor, index) => {
+        const x = centroid.x + ((index % 2) - 0.5) * 18;
+        const y = centroid.y + (Math.floor(index / 2) - 0.5) * 18;
+        const mark = descriptor.scope === "removable" ? "−" : pizzaDescriptorMark(descriptor.name);
+        return `<text class="pizza-preview-mark ${descriptor.scope === "removable" ? "is-remove" : ""}" x="${x}" y="${y + 5}" text-anchor="middle">${escapeHTML(mark)}</text>`;
+      }).join("");
+      const number = activeDescriptors.length ? "" : `<text class="pizza-preview-num" x="${centroid.x}" y="${centroid.y + 5}" text-anchor="middle">${sliceIndex + 1}</text>`;
+      return `
+        <g>
+          <path d="${buildSlicePath(sliceIndex, pizzaSplit.sliceCount)}" fill="${fill}" stroke="rgba(69, 30, 16, .72)" stroke-width="2"></path>
+          ${number}
+          ${marks}
+        </g>
+      `;
+    }).join("");
+
+    return `
+      <svg class="pizza-preview-svg" viewBox="0 0 300 300" role="img" aria-label="تقسيم البيتسا">
+        <circle cx="150" cy="150" r="130" fill="#8a3f19"></circle>
+        <circle cx="150" cy="150" r="123" fill="#f6c76a"></circle>
+        <circle cx="150" cy="150" r="111" fill="#c93124" opacity=".92"></circle>
+        <circle cx="150" cy="150" r="105" fill="#ffd36c" opacity=".9"></circle>
+        ${slices}
+      </svg>
+    `;
+  };
+
+  const renderPizzaSplit = () => {
+    if (!pizzaSplit) return;
+    const price = computePizzaSplitPrice();
+    const sliceButtons = PIZZA_SLICE_COUNTS.map((count) => `
+      <button type="button" class="pizza-slice-count-btn ${count === pizzaSplit.sliceCount ? "is-active" : ""}" data-slice-count="${count}">${count}</button>
+    `).join("");
+    const chips = pizzaSplit.descriptors.map((descriptor) => {
+      const selected = countPizzaSlices(descriptor);
+      const isFull = selected === pizzaSplit.sliceCount;
+      const label = descriptor.scope === "removable" ? `بدون ${descriptor.name}` : descriptor.name;
+      const priceText = descriptor.scope === "paid" ? `<small>+${formatPrice(descriptor.price)}</small>` : "";
+      const badge = selected
+        ? `<em>${isFull ? "الكل" : `${selected}/${pizzaSplit.sliceCount}`}</em>`
+        : "";
+      return `
+        <button type="button" class="pizza-split-chip ${selected ? "is-selected" : ""} is-${descriptor.scope}"
+          style="--chip-color:${escapeHTML(descriptor.color)}"
+          data-scope="${escapeHTML(descriptor.scope)}"
+          data-name="${escapeHTML(descriptor.name)}">
+          <span></span>
+          <strong>${escapeHTML(label)}</strong>
+          ${priceText}
+          ${badge}
+        </button>
+      `;
+    }).join("");
+
+    pizzaSplitContent.innerHTML = `
+      <header class="pizza-split-head">
+        <span class="category-pill">بيتسا</span>
+        <h2 id="pizzaSplitTitle">${escapeHTML(pizzaSplit.product.name)}</h2>
+        <p>اختر عدد القطع، ثم اضغط على أي إضافة أو مكوّن لتحديد القطع التي تريدها عليها.</p>
+      </header>
+
+      <div class="pizza-split-layout">
+        <div class="pizza-preview-panel">
+          ${renderPizzaPreview()}
+          <p class="pizza-split-hint">الأرقام تعني قطع بدون تعديل. العلامات تظهر على القطع التي اخترتها.</p>
+        </div>
+
+        <div class="pizza-split-controls">
+          <div class="pizza-split-field">
+            <span>عدد القطع</span>
+            <div class="pizza-slice-counts">${sliceButtons}</div>
+          </div>
+
+          <div class="pizza-split-field">
+            <span>الإضافات والمكونات</span>
+            <div class="pizza-split-chips">${chips || `<p class="muted-line">لا توجد إضافات لهذه البيتسا.</p>`}</div>
+          </div>
+
+          <label class="pizza-note-field">
+            <span>ملاحظات خاصة</span>
+            <textarea id="pizzaSplitNotes" rows="3" placeholder="مثال: خبز زيادة، تقطيع جيد...">${escapeHTML(pizzaSplit.notes)}</textarea>
+          </label>
+
+          <div class="pizza-split-bottom">
+            <div class="qty-stepper">
+              <span>الكمية</span>
+              <button type="button" id="pizzaQtyMinus" aria-label="إنقاص الكمية">−</button>
+              <strong id="pizzaQtyValue">${pizzaSplit.qty}</strong>
+              <button type="button" id="pizzaQtyPlus" aria-label="زيادة الكمية">+</button>
+            </div>
+            <div class="pizza-price-box">
+              <span>السعر</span>
+              <strong>${formatPrice(price.total)}</strong>
+              ${price.addons ? `<small>الإضافات المختارة: +${formatPrice(price.addons)} للوحدة</small>` : ""}
+            </div>
+          </div>
+
+          <button class="add-cart-btn pizza-save-btn" id="pizzaSplitSave" type="button">
+            ${pizzaSplit.editingCartId ? "حفظ التعديل" : "إضافة للسلة"} — ${formatPrice(price.total)}
+          </button>
+        </div>
+      </div>
+    `;
+
+    pizzaSplitContent.querySelectorAll("[data-slice-count]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextCount = Number(button.dataset.sliceCount);
+        if (!PIZZA_SLICE_COUNTS.includes(nextCount) || nextCount === pizzaSplit.sliceCount) return;
+        pizzaSplit.sliceCount = nextCount;
+        clampSliceSelections(pizzaSplit.selections, nextCount);
+        renderPizzaSplit();
+      });
+    });
+
+    pizzaSplitContent.querySelectorAll(".pizza-split-chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        const descriptor = pizzaSplit.descriptors.find((item) => item.scope === button.dataset.scope && item.name === button.dataset.name);
+        if (descriptor) openPizzaSliceSheet(descriptor);
+      });
+    });
+
+    pizzaSplitContent.querySelector("#pizzaSplitNotes").addEventListener("input", (event) => {
+      pizzaSplit.notes = event.target.value;
+    });
+    pizzaSplitContent.querySelector("#pizzaQtyMinus").addEventListener("click", () => {
+      pizzaSplit.qty = Math.max(1, pizzaSplit.qty - 1);
+      renderPizzaSplit();
+    });
+    pizzaSplitContent.querySelector("#pizzaQtyPlus").addEventListener("click", () => {
+      pizzaSplit.qty += 1;
+      renderPizzaSplit();
+    });
+    pizzaSplitContent.querySelector("#pizzaSplitSave").addEventListener("click", savePizzaSplit);
+  };
+
+  const closePizzaSliceSheet = () => {
+    if (!pizzaSliceSheet) return;
+    pizzaSliceSheet.remove();
+    pizzaSliceSheet = null;
+  };
+
+  const openPizzaSliceSheet = (descriptor) => {
+    closePizzaSliceSheet();
+    const key = pizzaDescriptorKey(descriptor);
+    const selected = new Set(pizzaSplit.selections.get(key) || []);
+    const title = descriptor.scope === "removable" ? `حدد القطع بدون ${descriptor.name}` : `حدد القطع لـ ${descriptor.name}`;
+    const sheet = document.createElement("div");
+    sheet.className = "pizza-slice-sheet";
+    sheet.innerHTML = `
+      <div class="pizza-slice-sheet-backdrop"></div>
+      <div class="pizza-slice-sheet-panel" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}">
+        <header>
+          <h3>${escapeHTML(title)} ${descriptor.scope === "paid" ? `<small>+${formatPrice(descriptor.price)}</small>` : ""}</h3>
+          <button type="button" class="pizza-slice-sheet-close" aria-label="إغلاق">×</button>
+        </header>
+        <div class="pizza-slice-sheet-actions">
+          <button type="button" data-pizza-quick="all">الكل</button>
+          <button type="button" data-pizza-quick="none">لا شيء</button>
+        </div>
+        <div class="pizza-slice-sheet-canvas"></div>
+        <p>اضغط على القطع لتحديدها أو إلغاء تحديدها.</p>
+        <button type="button" class="pizza-slice-confirm"></button>
+      </div>
+    `;
+    document.body.appendChild(sheet);
+    pizzaSliceSheet = sheet;
+
+    const canvas = sheet.querySelector(".pizza-slice-sheet-canvas");
+    const confirm = sheet.querySelector(".pizza-slice-confirm");
+    const refreshConfirm = () => {
+      confirm.textContent = `تأكيد القطع (${selected.size} محددة)`;
+    };
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 300 300");
+    svg.classList.add("pizza-slice-sheet-svg");
+    svg.innerHTML = `<circle cx="150" cy="150" r="130" fill="#8a3f19"></circle><circle cx="150" cy="150" r="122" fill="#ffd36c"></circle>`;
+    for (let index = 0; index < pizzaSplit.sliceCount; index += 1) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const centroid = sliceCentroid(index, pizzaSplit.sliceCount);
+      path.setAttribute("d", buildSlicePath(index, pizzaSplit.sliceCount));
+      path.setAttribute("class", selected.has(index) ? "is-on" : "");
+      path.dataset.slice = String(index);
+      path.addEventListener("click", () => {
+        if (selected.has(index)) selected.delete(index);
+        else selected.add(index);
+        path.setAttribute("class", selected.has(index) ? "is-on" : "");
+        refreshConfirm();
+      });
+      svg.appendChild(path);
+
+      const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label.setAttribute("x", centroid.x);
+      label.setAttribute("y", centroid.y + 5);
+      label.setAttribute("text-anchor", "middle");
+      label.textContent = String(index + 1);
+      svg.appendChild(label);
+    }
+    canvas.appendChild(svg);
+    refreshConfirm();
+
+    sheet.querySelector('[data-pizza-quick="all"]').addEventListener("click", () => {
+      selected.clear();
+      for (let index = 0; index < pizzaSplit.sliceCount; index += 1) selected.add(index);
+      sheet.querySelectorAll(".pizza-slice-sheet-svg path").forEach((path) => path.setAttribute("class", "is-on"));
+      refreshConfirm();
+    });
+    sheet.querySelector('[data-pizza-quick="none"]').addEventListener("click", () => {
+      selected.clear();
+      sheet.querySelectorAll(".pizza-slice-sheet-svg path").forEach((path) => path.setAttribute("class", ""));
+      refreshConfirm();
+    });
+    sheet.querySelector(".pizza-slice-sheet-backdrop").addEventListener("click", closePizzaSliceSheet);
+    sheet.querySelector(".pizza-slice-sheet-close").addEventListener("click", closePizzaSliceSheet);
+    confirm.addEventListener("click", () => {
+      pizzaSplit.selections.set(key, selected);
+      closePizzaSliceSheet();
+      renderPizzaSplit();
+    });
+    requestAnimationFrame(() => sheet.classList.add("is-open"));
+  };
+
+  const savePizzaSplit = () => {
+    if (!pizzaSplit) return;
+    const productName = pizzaSplit.product.name;
+    const isEditing = Boolean(pizzaSplit.editingCartId);
+    const price = computePizzaSplitPrice();
+    const sections = Array.from({ length: pizzaSplit.sliceCount }, (_, sliceIndex) => {
+      const selectedDescriptors = pizzaSplit.descriptors.filter((descriptor) => pizzaSplit.selections.get(pizzaDescriptorKey(descriptor))?.has(sliceIndex));
+      const definition = getPizzaSliceDefinition(sliceIndex);
+      return {
+        key: definition.key,
+        label: definition.label,
+        freeAdditions: selectedDescriptors.filter((descriptor) => descriptor.scope === "free").map((descriptor) => descriptor.name),
+        paidAdditions: selectedDescriptors.filter((descriptor) => descriptor.scope === "paid").map((descriptor) => descriptor.name),
+        removedIngredients: selectedDescriptors.filter((descriptor) => descriptor.scope === "removable").map((descriptor) => descriptor.name)
+      };
+    });
+    const additionsText = buildPizzaAdditionsTextFromSections(sections);
+    const pizzaAdditions = getFlatPizzaAdditionsFromSections(sections);
+    const removedIngredients = uniqueValues(sections.flatMap((section) => section.removedIngredients || []));
+
+    const item = {
+      cartId: pizzaSplit.editingCartId || newCartId(),
+      productId: pizzaSplit.product.id,
+      qty: pizzaSplit.qty,
+      removedIngredients,
+      freeAddons: [],
+      paidAddons: [],
+      notes: pizzaSplit.notes.trim(),
+      splitMode: "slices",
+      pizzaSplitMode: "slices",
+      sliceCount: pizzaSplit.sliceCount,
+      pizzaSections: sections,
+      pizzaAdditions,
+      additionsText,
+      sliceSummary: additionsText,
+      sliceAddonsCost: price.addons
+    };
+
+    if (isEditing) {
+      cart = cart.map((cartItem) => cartItem.cartId === pizzaSplit.editingCartId ? item : cartItem);
+    } else {
+      cart.push(item);
+    }
+
+    renderCart();
+    closePizzaSplit();
+    if (!isEditing) pulseFloat();
+    showToast(isEditing ? "تم تحديث البيتسا." : `تمت إضافة ${productName} إلى السلة.`);
+  };
+
+  const openProductPicker = (product, cartItem = null) => {
+    if (isPizzaProduct(product)) {
+      openPizzaSplit(product, cartItem);
+      return;
+    }
+    openCustomizer(product, cartItem);
+  };
+
   const openCustomizer = (product, cartItem = null) => {
     activeProduct = product;
     editingCartId = cartItem?.cartId || null;
@@ -399,6 +886,7 @@
       !item.removedIngredients.length &&
       !item.freeAddons.length &&
       !item.paidAddons.length &&
+      item.splitMode !== "slices" &&
       !item.notes
     );
 
@@ -412,7 +900,12 @@
         removedIngredients: [],
         freeAddons: [],
         paidAddons: [],
-        notes: ""
+        notes: "",
+        splitMode: null,
+        sliceCount: 0,
+        pizzaSections: [],
+        sliceSummary: [],
+        sliceAddonsCost: 0
       });
     }
 
@@ -434,7 +927,12 @@
       removedIngredients: checkedValues("removedIngredients"),
       freeAddons: checkedValues("freeAddons"),
       paidAddons: checkedPaidAddons(),
-      notes: itemNotes.value.trim()
+      notes: itemNotes.value.trim(),
+      splitMode: null,
+      sliceCount: 0,
+      pizzaSections: [],
+      sliceSummary: [],
+      sliceAddonsCost: 0
     };
 
     if (isEditing) {
@@ -451,7 +949,12 @@
 
   const renderItemDetails = (item) => {
     const details = [];
-    if (item.removedIngredients.length) details.push(`بدون: ${item.removedIngredients.join("، ")}`);
+    if (item.splitMode === "slices") {
+      toArray(item.additionsText?.length ? item.additionsText : item.sliceSummary).forEach((summary) => details.push(summary));
+      if (item.sliceAddonsCost) details.push(`تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+    } else if (item.removedIngredients.length) {
+      details.push(`بدون: ${item.removedIngredients.join("، ")}`);
+    }
     if (item.freeAddons.length) details.push(`إضافات مجانية: ${item.freeAddons.join("، ")}`);
     if (item.paidAddons.length) details.push(`إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} +${formatPrice(addon.price)}`).join("، ")}`);
     if (item.notes) details.push(`ملاحظة: ${item.notes}`);
@@ -525,7 +1028,12 @@
       if (!product) return;
       total += itemTotal(item);
       lines.push(`${index + 1}) ${product.name} × ${item.qty} — ${formatPrice(itemTotal(item))}`);
-      if (item.removedIngredients.length) lines.push(`   بدون: ${item.removedIngredients.join("، ")}`);
+      if (item.splitMode === "slices") {
+        toArray(item.additionsText?.length ? item.additionsText : item.sliceSummary).forEach((summary) => lines.push(`   ${summary}`));
+        if (item.sliceAddonsCost) lines.push(`   تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+      } else if (item.removedIngredients.length) {
+        lines.push(`   بدون: ${item.removedIngredients.join("، ")}`);
+      }
       if (item.freeAddons.length) lines.push(`   إضافات مجانية: ${item.freeAddons.join("، ")}`);
       if (item.paidAddons.length) lines.push(`   إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} (+${formatPrice(addon.price)})`).join("، ")}`);
       if (item.notes) lines.push(`   ملاحظة: ${item.notes}`);
@@ -555,11 +1063,16 @@
     if (!button) return;
     const product = getProduct(button.dataset.productId);
     if (!product) return;
-    if (productHasOptions(product)) {
-      openCustomizer(product);
-    } else {
-      addSimpleProduct(product);
-    }
+    openProductPicker(product);
+  });
+
+  grid.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const row = event.target.closest(".product-row[data-product-id]");
+    if (!row) return;
+    event.preventDefault();
+    const product = getProduct(row.dataset.productId);
+    if (product) openProductPicker(product);
   });
 
   cartItems.addEventListener("click", (event) => {
@@ -571,7 +1084,7 @@
     if (editButton) {
       const item = cart.find((cartItem) => cartItem.cartId === editButton.dataset.editId);
       const product = item ? getProduct(item.productId) : null;
-      if (product && item) openCustomizer(product, item);
+      if (product && item) openProductPicker(product, item);
     }
 
     if (removeButton) {
@@ -613,10 +1126,21 @@
 
   closeCustomizer.addEventListener("click", closeModal);
   saveCartItem.addEventListener("click", saveItem);
+  if (pizzaSplitClose) pizzaSplitClose.addEventListener("click", closePizzaSplit);
   customizer.addEventListener("click", (event) => {
     if (event.target === customizer) closeModal();
   });
+  if (pizzaSplitModal) {
+    pizzaSplitModal.addEventListener("click", (event) => {
+      if (event.target === pizzaSplitModal) closePizzaSplit();
+    });
+  }
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && pizzaSliceSheet) {
+      closePizzaSliceSheet();
+      return;
+    }
+    if (event.key === "Escape" && pizzaSplitModal?.classList.contains("is-open")) closePizzaSplit();
     if (event.key === "Escape" && customizer.classList.contains("is-open")) closeModal();
     if (event.key === "Escape" && cartPanel.classList.contains("is-open")) closeCart();
   });

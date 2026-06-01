@@ -11,15 +11,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=El+Messiri:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/main.css?v=20260601-transparent-logo">
+  <link rel="stylesheet" href="css/menu.css?v=20260601-pizza-slices">
   <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/enhancements.css">
+  <link rel="stylesheet" href="css/enhancements.css?v=20260601-credit">
 </head>
 <body class="menu-page">
   <header class="site-header solid">
     <a class="brand" href="index.html" aria-label="بيتسا البلد">
-      <span class="brand-mark"><img src="assets/logo.png" alt="" width="52" height="52"></span>
+      <span class="brand-mark"><img src="assets/logo-transparent.png" alt="" width="52" height="52"></span>
       <span>بيتسا البلد</span>
     </a>
     <nav class="nav-links" aria-label="التنقل الرئيسي">
@@ -34,7 +34,7 @@
   <main class="menu-shell" data-view="categories">
     <div class="categories-view">
       <section class="menu-hero-brand">
-        <img class="mhb-logo" src="assets/logo.png" alt="بيتسا البلد" width="84" height="84">
+        <img class="mhb-logo" src="assets/logo-transparent.png" alt="بيتسا البلد" width="84" height="84">
         <p class="mhb-welcome">— أهلاً بك —</p>
         <h1 class="mhb-title">بيتسا لذيذة<br><span>من أجلك</span></h1>
         <button class="mhb-choose" id="scrollToCats" type="button">اختر فئة</button>
@@ -112,9 +112,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2z"/></svg>
       <span>اتصل</span>
     </a>
-    <a class="bottom-nav-item" href="index.html#about" aria-label="عن المطعم">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
-      <span>حول</span>
+    <a class="bottom-nav-item" data-site-instagram href="https://instagram.com/pizza._.albld" target="_blank" rel="noopener" aria-label="إنستغرام بيتسا البلد">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><path d="M17.5 6.5h.01"/></svg>
+      <span>إنستغرام</span>
     </a>
   </nav>
 
@@ -152,8 +152,17 @@
     </div>
   </div>
 
+  <div class="pizza-split-modal" id="pizzaSplitModal" aria-hidden="true">
+    <div class="pizza-split-dialog" role="dialog" aria-modal="true" aria-labelledby="pizzaSplitTitle">
+      <button class="modal-close pizza-split-close" id="pizzaSplitClose" type="button" aria-label="إغلاق">×</button>
+      <div id="pizzaSplitContent"></div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
+    <p class="credit-line">تم تصميم الموقع من قبل <a href="https://oh-tech.co" target="_blank" rel="noopener">O&amp;H Tech</a></p>
+    <a href="policy.html">سياسة الموقع والخصوصية</a>
     <a href="index.html">الصفحة الرئيسية</a>
   </footer>
 
@@ -161,6 +170,6 @@
 
   <script src="data/site.js"></script>
   <script src="data/menu.js"></script>
-  <script src="js/menu.js" defer></script>
+  <script src="js/menu.js?v=20260602-staff-slices" defer></script>
 </body>
 </html>

@@ -134,10 +134,10 @@ input {
   place-items: center;
   width: 58px;
   height: 48px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .96);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, .2), 0 0 0 1px rgba(242, 184, 75, .18);
-  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .brand-mark img {
@@ -145,6 +145,7 @@ input {
   height: 52px;
   object-fit: contain;
   transform: translateY(1px);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .45));
 }
 
 .nav-links {

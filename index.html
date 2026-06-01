@@ -16,11 +16,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=El+Messiri:wght@400;500;600;700&display=swap">
-  <link rel="preload" href="css/main.css" as="style">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="preload" href="css/main.css?v=20260601-transparent-logo" as="style">
+  <link rel="stylesheet" href="css/main.css?v=20260601-transparent-logo">
+  <link rel="stylesheet" href="css/animations.css?v=20260601-logo-loader">
   <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/enhancements.css">
+  <link rel="stylesheet" href="css/enhancements.css?v=20260601-clean-ar">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -45,50 +45,30 @@
 </head>
 <body>
   <div class="loader" id="siteLoader" aria-label="تحميل الموقع">
-    <div class="loader-glow" aria-hidden="true"></div>
-    <div class="loader-stage" aria-hidden="true">
-      <div class="oven">
-        <div class="oven-arch"></div>
-        <div class="oven-mouth">
-          <span class="flame flame-1"></span>
-          <span class="flame flame-2"></span>
-          <span class="flame flame-3"></span>
-          <span class="ember ember-1"></span>
-          <span class="ember ember-2"></span>
-          <span class="ember ember-3"></span>
-          <span class="ember ember-4"></span>
-        </div>
+    <div class="brand-loader-shell">
+      <div class="brand-loader-orbit" aria-hidden="true">
+        <span class="logo-ring logo-ring-gold"></span>
+        <span class="logo-ring logo-ring-red"></span>
+        <span class="logo-ring logo-ring-dots"></span>
+        <span class="logo-spark spark-1"></span>
+        <span class="logo-spark spark-2"></span>
+        <span class="logo-spark spark-3"></span>
+        <img class="loader-logo-img" src="assets/logo-transparent.png" alt="">
       </div>
-      <div class="loader-peel">
-        <span></span>
-      </div>
-      <div class="cinema-pizza">
-        <div class="cinema-crust"></div>
-        <div class="cinema-sauce"></div>
-        <div class="cinema-cheese"></div>
-        <i class="pep p1"></i>
-        <i class="pep p2"></i>
-        <i class="pep p3"></i>
-        <i class="olive o1"></i>
-        <i class="olive o2"></i>
-        <i class="basil b1"></i>
-        <i class="basil b2"></i>
-        <span class="cut-line c1"></span>
-        <span class="cut-line c2"></span>
-        <span class="cut-line c3"></span>
-        <span class="cut-line c4"></span>
-      </div>
-      <div class="loader-brand">
-        <img src="assets/logo.png" alt="">
+      <div class="brand-loader-copy">
         <strong>بيتسا البلد</strong>
-        <span>نجهز الفرن...</span>
+        <span>نجهز التجربة...</span>
       </div>
+      <div class="loader-progress-track" aria-hidden="true">
+        <span id="loaderProgressBar"></span>
+      </div>
+      <div class="loader-percent" id="loaderPercent" aria-live="polite">0%</div>
     </div>
   </div>
 
   <header class="site-header" id="top">
     <a class="brand" href="index.html" aria-label="بيتسا البلد">
-      <span class="brand-mark"><img src="assets/logo.png" alt="" width="52" height="52"></span>
+      <span class="brand-mark"><img src="assets/logo-transparent.png" alt="" width="52" height="52"></span>
       <span>بيتسا البلد</span>
     </a>
     <nav class="nav-links" aria-label="التنقل الرئيسي">
@@ -120,7 +100,7 @@
         </div>
         <ul class="hero-badges">
           <li>عجينة مخمّرة ببطء</li>
-          <li>جبنة موزاريلا 100٪</li>
+          <li>جبنة موزاريلا 100%</li>
           <li>تحضير يومي طازج</li>
         </ul>
       </div>
@@ -169,13 +149,13 @@
       <div class="steps-grid stagger-group">
         <article class="step-card stagger-item">
           <span class="step-num">1</span>
-          <h3>تصفّح القائمة</h3>
+          <h3>تصفح القائمة</h3>
           <p>افتح قائمة الطعام واكتشف البيتسا والباستا والرڤيولي والسلطات والمشروبات.</p>
         </article>
         <article class="step-card stagger-item">
           <span class="step-num">2</span>
-          <h3>خصّص طلبك</h3>
-          <p>أضف أو أزِل المكونات، واختر الإضافات المجانية والمدفوعة التي تحبها لكل صنف.</p>
+          <h3>خصص طلبك</h3>
+          <p>أضف أو أزل المكونات، واختر الإضافات المجانية والمدفوعة التي تحبها لكل صنف.</p>
         </article>
         <article class="step-card stagger-item">
           <span class="step-num">3</span>
@@ -232,7 +212,7 @@
       <div class="cta-inner">
         <p class="eyebrow">جاهز تطلب؟</p>
         <h2>قائمتنا الكاملة بانتظارك</h2>
-        <p>بيتسا طازجة من الفرن، باستا غنية، رڤيولي محشو، وسلطات منعشة — كلها على بُعد ضغطة واحدة.</p>
+        <p>بيتسا طازجة من الفرن، باستا غنية، رڤيولي محشو، وسلطات منعشة. كلها على بعد ضغطة واحدة.</p>
         <a class="btn btn-primary" href="menu.html">افتح قائمة الطعام</a>
       </div>
     </section>
@@ -240,6 +220,8 @@
 
   <footer class="site-footer">
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
+    <p class="credit-line">تم تصميم الموقع من قبل <a href="https://oh-tech.co" target="_blank" rel="noopener">O&amp;H Tech</a></p>
+    <a href="policy.html">سياسة الموقع والخصوصية</a>
     <a href="#top">العودة للأعلى</a>
   </footer>
 
@@ -251,6 +233,6 @@
   <script src="data/site.js"></script>
   <script src="data/menu.js"></script>
   <script src="js/main.js" defer></script>
-  <script src="js/animations.js" defer></script>
+  <script src="js/animations.js?v=20260601-logo-loader" defer></script>
 </body>
 </html>
