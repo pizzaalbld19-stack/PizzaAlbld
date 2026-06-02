@@ -978,6 +978,47 @@
     removed: [...toArray(section.removedIngredients)].sort()
   });
 
+  const buildPizzaSectionGroups = (sections) => {
+    const groups = [];
+    toArray(sections).forEach((section, index) => {
+      const signature = pizzaSectionSignature(section);
+      if (groups.length && groups[groups.length - 1].signature === signature) {
+        groups[groups.length - 1].end = index + 1;
+        groups[groups.length - 1].count += 1;
+      } else {
+        groups.push({
+          signature,
+          start: index + 1,
+          end: index + 1,
+          count: 1,
+          section
+        });
+      }
+    });
+    return groups;
+  };
+
+  const formatSliceRange = (start, end) => {
+    if (start === end) return `ق${start}`;
+    if (end - start === 1) return `ق${start}، ق${end}`;
+    return `ق${start}–ق${end}`;
+  };
+
+  const formatPrettyFraction = (part, total) => {
+    const raw = formatFraction(part, total);
+    return ({
+      "1/2": "½",
+      "1/3": "⅓",
+      "2/3": "⅔",
+      "1/4": "¼",
+      "3/4": "¾",
+      "1/8": "⅛",
+      "3/8": "⅜",
+      "5/8": "⅝",
+      "7/8": "⅞"
+    })[raw] || raw;
+  };
+
   const pizzaAddonPriceByName = (product, name) => {
     const addon = toArray(product?.paidAddons).find((item) => normalize(item.name) === normalize(name));
     return Number(addon?.price || 0);
@@ -1010,23 +1051,7 @@
   const renderPizzaSliceDetails = (item, product) => {
     const sections = toArray(item.pizzaSections);
     if (!sections.length) return "";
-    const groups = [];
-
-    sections.forEach((section, index) => {
-      const signature = pizzaSectionSignature(section);
-      if (groups.length && groups[groups.length - 1].signature === signature) {
-        groups[groups.length - 1].end = index + 1;
-        groups[groups.length - 1].count += 1;
-      } else {
-        groups.push({
-          signature,
-          start: index + 1,
-          end: index + 1,
-          count: 1,
-          section
-        });
-      }
-    });
+    const groups = buildPizzaSectionGroups(sections);
 
     const rows = groups.map((group) => {
       const section = group.section;
@@ -1035,7 +1060,7 @@
         ...toArray(section.paidAdditions).map((name) => renderPizzaChip(product, "paid", name)),
         ...toArray(section.removedIngredients).map((name) => renderPizzaChip(product, "removed", name))
       ].join("");
-      const label = group.start === group.end ? `ق${group.start}` : `ق${group.start}، ق${group.end}`;
+      const label = formatSliceRange(group.start, group.end);
       return `
         <div class="pizza-slice-detail-row">
           <span class="pizza-slice-range">${escapeHTML(label)}</span>
@@ -1069,6 +1094,37 @@
     return details.length
       ? details.map((detail) => detail.trim().startsWith("<") ? detail : `<p>${escapeHTML(detail)}</p>`).join("")
       : `<p>بدون تعديلات خاصة</p>`;
+  };
+
+  const buildWhatsAppPizzaDetails = (item, product) => {
+    const sections = toArray(item.pizzaSections);
+    if (!sections.length) return [];
+
+    const lines = [
+      "   🍕 تفاصيل شرائح البيتسا:",
+      `   عدد القطع: ${sections.length}`
+    ];
+
+    buildPizzaSectionGroups(sections).forEach((group) => {
+      const section = group.section;
+      const items = [
+        ...toArray(section.freeAdditions).map((name) => `${pizzaDetailIcon(name)} ${name}`),
+        ...toArray(section.paidAdditions).map((name) => {
+          const price = pizzaAddonPriceByName(product, name);
+          return `${pizzaDetailIcon(name)} ${name}${price ? ` +${formatPrice(price)}` : ""}`;
+        }),
+        ...toArray(section.removedIngredients).map((name) => `بدون ${name}`)
+      ];
+      const fraction = formatPrettyFraction(group.count, sections.length);
+      lines.push(`   ${fraction} | ${formatSliceRange(group.start, group.end)}`);
+      lines.push(`      ${items.length ? items.join("، ") : "بدون تعديلات"}`);
+    });
+
+    const paid = uniqueValues(sections.flatMap((section) => section.paidAdditions || []));
+    if (paid.length) lines.push(`   الإضافات المدفوعة المحتسبة: ${paid.join("، ")}`);
+    if (item.sliceAddonsCost) lines.push(`   تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+
+    return lines;
   };
 
   const renderCart = () => {
@@ -1139,8 +1195,7 @@
       total += itemTotal(item);
       lines.push(`${index + 1}) ${product.name} × ${item.qty} — ${formatPrice(itemTotal(item))}`);
       if (item.splitMode === "slices") {
-        toArray(item.additionsText?.length ? item.additionsText : item.sliceSummary).forEach((summary) => lines.push(`   ${summary}`));
-        if (item.sliceAddonsCost) lines.push(`   تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+        lines.push(...buildWhatsAppPizzaDetails(item, product));
       } else if (item.removedIngredients.length) {
         lines.push(`   بدون: ${item.removedIngredients.join("، ")}`);
       }
