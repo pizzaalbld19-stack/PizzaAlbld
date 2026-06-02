@@ -344,6 +344,17 @@
   const PIZZA_SLICE_COUNTS = [4, 8, 10, 12, 16];
   const PIZZA_DEFAULT_SLICE_COUNT = 8;
   const PIZZA_COLORS = ["#f7b84b", "#d9472f", "#2f9f72", "#9f6bff", "#f97316", "#38bdf8", "#ef5da8", "#84cc16"];
+  const PIZZA_NAMED_COLORS = [
+    { words: ["زيتون أخضر"], color: "#2f9f55" },
+    { words: ["ذرة"], color: "#ffd22e" },
+    { words: ["فلفل حار"], color: "#8bdc45" },
+    { words: ["زيتون أسود"], color: "#151515" },
+    { words: ["فقع", "فطر"], color: "#8b8b84" },
+    { words: ["طماطم", "طاطم"], color: "#d92f24" },
+    { words: ["بصل"], color: "#f8f1df" },
+    { words: ["فلفل ألوان"], color: "#d99a13" },
+    { words: ["تونة"], color: "#8b5a2b" }
+  ];
   const PIZZA_EMOJI = [
     { words: ["زيتون"], mark: "●" },
     { words: ["ذرة"], mark: "●" },
@@ -356,9 +367,12 @@
   ];
 
   const pizzaDescriptorKey = (descriptor) => `${descriptor.scope}:${descriptor.name}`;
-  const pizzaDescriptorColor = (descriptor, index = 0) => descriptor.scope === "removable"
-    ? "#f43f5e"
-    : PIZZA_COLORS[index % PIZZA_COLORS.length];
+  const pizzaDescriptorColor = (descriptor, index = 0) => {
+    const text = normalize(descriptor.name);
+    const named = PIZZA_NAMED_COLORS.find((entry) => entry.words.some((word) => text.includes(normalize(word))));
+    if (named) return named.color;
+    return descriptor.scope === "removable" ? "#f43f5e" : PIZZA_COLORS[index % PIZZA_COLORS.length];
+  };
   const pizzaDescriptorMark = (name) => {
     const text = normalize(name);
     const item = PIZZA_EMOJI.find((entry) => entry.words.some((word) => text.includes(normalize(word))));
@@ -560,7 +574,7 @@
     const sliceButtons = PIZZA_SLICE_COUNTS.map((count) => `
       <button type="button" class="pizza-slice-count-btn ${count === pizzaSplit.sliceCount ? "is-active" : ""}" data-slice-count="${count}">${count}</button>
     `).join("");
-    const chips = pizzaSplit.descriptors.map((descriptor) => {
+    const chips = pizzaSplit.descriptors.map((descriptor, index, descriptors) => {
       const selected = countPizzaSlices(descriptor);
       const isFull = selected === pizzaSplit.sliceCount;
       const label = descriptor.scope === "removable" ? `بدون ${descriptor.name}` : descriptor.name;
@@ -568,7 +582,11 @@
       const badge = selected
         ? `<em>${isFull ? "الكل" : `${selected}/${pizzaSplit.sliceCount}`}</em>`
         : "";
+      const divider = index > 0 && descriptors[index - 1].scope !== descriptor.scope
+        ? `<span class="pizza-addon-divider" aria-hidden="true"></span>`
+        : "";
       return `
+        ${divider}
         <button type="button" class="pizza-split-chip ${selected ? "is-selected" : ""} is-${descriptor.scope}"
           style="--chip-color:${escapeHTML(descriptor.color)}"
           data-scope="${escapeHTML(descriptor.scope)}"
@@ -947,18 +965,110 @@
     showToast(isEditing ? "تم تحديث الصنف." : `تمت إضافة ${productName} إلى السلة.`);
   };
 
+  const gcd = (a, b) => b ? gcd(b, a % b) : Math.abs(a);
+
+  const formatFraction = (part, total) => {
+    const divisor = gcd(part, total) || 1;
+    return `${part / divisor}/${total / divisor}`;
+  };
+
+  const pizzaSectionSignature = (section) => JSON.stringify({
+    free: [...toArray(section.freeAdditions)].sort(),
+    paid: [...toArray(section.paidAdditions)].sort(),
+    removed: [...toArray(section.removedIngredients)].sort()
+  });
+
+  const pizzaAddonPriceByName = (product, name) => {
+    const addon = toArray(product?.paidAddons).find((item) => normalize(item.name) === normalize(name));
+    return Number(addon?.price || 0);
+  };
+
+  const pizzaDetailIcon = (name) => {
+    const text = normalize(name);
+    if (text.includes("زيتون")) return "🫒";
+    if (text.includes("فقع") || text.includes("فطر")) return "🍄";
+    if (text.includes("ذرة")) return "🌽";
+    if (text.includes("طماطم") || text.includes("طاطم") || text.includes("بندورة")) return "🍅";
+    if (text.includes("بصل")) return "🧅";
+    if (text.includes("تونة")) return "🐟";
+    if (text.includes("فلفل")) return "🌶";
+    return "●";
+  };
+
+  const renderPizzaChip = (product, type, name) => {
+    const price = type === "paid" ? pizzaAddonPriceByName(product, name) : 0;
+    const label = type === "removed" ? `بدون ${name}` : `${name}${price ? ` +${formatPrice(price)}` : ""}`;
+    const color = pizzaDescriptorColor({ scope: type === "removed" ? "removable" : type, name });
+    return `
+      <span class="pizza-detail-chip is-${escapeHTML(type)}" style="--chip-color:${escapeHTML(color)}">
+        <span class="pizza-detail-chip-text">${escapeHTML(label)}</span>
+        <span class="pizza-detail-chip-icon" aria-hidden="true">${escapeHTML(pizzaDetailIcon(name))}</span>
+      </span>
+    `;
+  };
+
+  const renderPizzaSliceDetails = (item, product) => {
+    const sections = toArray(item.pizzaSections);
+    if (!sections.length) return "";
+    const groups = [];
+
+    sections.forEach((section, index) => {
+      const signature = pizzaSectionSignature(section);
+      if (groups.length && groups[groups.length - 1].signature === signature) {
+        groups[groups.length - 1].end = index + 1;
+        groups[groups.length - 1].count += 1;
+      } else {
+        groups.push({
+          signature,
+          start: index + 1,
+          end: index + 1,
+          count: 1,
+          section
+        });
+      }
+    });
+
+    const rows = groups.map((group) => {
+      const section = group.section;
+      const chips = [
+        ...toArray(section.freeAdditions).map((name) => renderPizzaChip(product, "free", name)),
+        ...toArray(section.paidAdditions).map((name) => renderPizzaChip(product, "paid", name)),
+        ...toArray(section.removedIngredients).map((name) => renderPizzaChip(product, "removed", name))
+      ].join("");
+      const label = group.start === group.end ? `ق${group.start}` : `ق${group.start}، ق${group.end}`;
+      return `
+        <div class="pizza-slice-detail-row">
+          <span class="pizza-slice-range">${escapeHTML(label)}</span>
+          <div class="pizza-slice-tags">${chips || `<span class="pizza-slice-empty">بدون تعديلات</span>`}</div>
+          <span class="pizza-slice-fraction">${escapeHTML(formatFraction(group.count, sections.length))}</span>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="pizza-slice-details">
+        <h4>تفاصيل الشرائح</h4>
+        <div class="pizza-slice-detail-list">${rows}</div>
+      </div>
+    `;
+  };
+
   const renderItemDetails = (item) => {
     const details = [];
     if (item.splitMode === "slices") {
-      toArray(item.additionsText?.length ? item.additionsText : item.sliceSummary).forEach((summary) => details.push(summary));
-      if (item.sliceAddonsCost) details.push(`تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+      const product = getProduct(item.productId);
+      const pizzaDetails = renderPizzaSliceDetails(item, product);
+      if (pizzaDetails) details.push(pizzaDetails);
+      if (item.sliceAddonsCost) details.push(`<p>تكلفة الإضافات المختارة: +${escapeHTML(formatPrice(item.sliceAddonsCost))} للوحدة</p>`);
     } else if (item.removedIngredients.length) {
       details.push(`بدون: ${item.removedIngredients.join("، ")}`);
     }
     if (item.freeAddons.length) details.push(`إضافات مجانية: ${item.freeAddons.join("، ")}`);
     if (item.paidAddons.length) details.push(`إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} +${formatPrice(addon.price)}`).join("، ")}`);
     if (item.notes) details.push(`ملاحظة: ${item.notes}`);
-    return details.length ? details.map((detail) => `<p>${escapeHTML(detail)}</p>`).join("") : `<p>بدون تعديلات خاصة</p>`;
+    return details.length
+      ? details.map((detail) => detail.trim().startsWith("<") ? detail : `<p>${escapeHTML(detail)}</p>`).join("")
+      : `<p>بدون تعديلات خاصة</p>`;
   };
 
   const renderCart = () => {
