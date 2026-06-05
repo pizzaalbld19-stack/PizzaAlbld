@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; frame-src https://www.google.com https://maps.google.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قائمة بيتسا البلد | بيتسا، باستا، رڤيولي وسلطات</title>
   <meta name="description" content="استعرض قائمة بيتسا البلد، اختر المكونات والإضافات، واجمع طلبك في سلة عرض للنادل بدون إتمام طلب إلكتروني.">
   <meta name="theme-color" content="#120d0a">
@@ -11,10 +14,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=El+Messiri:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/main.css?v=20260601-transparent-logo">
-  <link rel="stylesheet" href="css/menu.css?v=20260602-slice-details-card">
+  <link rel="stylesheet" href="css/main.css?v=20260606-close-center">
+  <link rel="stylesheet" href="css/menu.css?v=20260606-close-center">
   <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/enhancements.css?v=20260602-menu-hero">
+  <link rel="stylesheet" href="css/enhancements.css?v=20260606-availability">
 </head>
 <body class="menu-page">
   <header class="site-header solid">
@@ -111,7 +114,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2z"/></svg>
       <span>اتصل</span>
     </a>
-    <a class="bottom-nav-item" data-site-instagram href="https://instagram.com/pizza._.albld" target="_blank" rel="noopener" aria-label="إنستغرام بيتسا البلد">
+    <a class="bottom-nav-item" data-site-instagram href="https://instagram.com/pizza._.albld" target="_blank" rel="noopener noreferrer" aria-label="إنستغرام بيتسا البلد">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><path d="M17.5 6.5h.01"/></svg>
       <span>إنستغرام</span>
     </a>
@@ -140,10 +143,12 @@
           </label>
 
           <div class="modal-actions">
-            <label class="qty-stepper">
+            <div class="qty-stepper customizer-qty-stepper">
               <span>الكمية</span>
-              <input id="itemQty" type="number" min="1" value="1">
-            </label>
+              <button type="button" id="itemQtyMinus" aria-label="إنقاص الكمية">−</button>
+              <strong id="itemQty" class="qty-readonly" aria-live="polite">1</strong>
+              <button type="button" id="itemQtyPlus" aria-label="زيادة الكمية">+</button>
+            </div>
             <button class="add-cart-btn" id="saveCartItem" type="button">إضافة للسلة</button>
           </div>
         </div>
@@ -160,7 +165,7 @@
 
   <footer class="site-footer">
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
-    <p class="credit-line">تم تطوير الموقع في شركة  <a href="https://oh-tech.co" target="_blank" rel="noopener">O&amp;H Tech</a></p>
+    <p class="credit-line">تم تطوير الموقع في شركة  <a href="https://oh-tech.co" target="_blank" rel="noopener noreferrer">O&amp;H Tech</a></p>
     <a href="policy.html">سياسة الموقع والخصوصية</a>
     <a href="index.html">الصفحة الرئيسية</a>
   </footer>
@@ -168,7 +173,7 @@
   <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
 
   <script src="data/site.js"></script>
-  <script src="data/menu.js"></script>
-  <script src="js/menu.js?v=20260603-whatsapp-pizza-details" defer></script>
+  <script src="data/menu.js?v=20260606-availability"></script>
+  <script src="js/menu.js?v=20260606-availability" defer></script>
 </body>
 </html>

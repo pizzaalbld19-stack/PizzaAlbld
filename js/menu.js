@@ -38,6 +38,8 @@
   const paidAddonOptions = document.getElementById("paidAddonOptions");
   const itemNotes = document.getElementById("itemNotes");
   const itemQty = document.getElementById("itemQty");
+  const itemQtyMinus = document.getElementById("itemQtyMinus");
+  const itemQtyPlus = document.getElementById("itemQtyPlus");
 
   const categoryCards = document.getElementById("categoryCards");
   const scrollToCats = document.getElementById("scrollToCats");
@@ -47,6 +49,7 @@
   const activeCategoryTitle = document.getElementById("activeCategoryTitle");
 
   const STORAGE_KEY = "pizzaBaladCart";
+  const MAX_ITEM_QTY = 20;
 
   let activeCategory = "الكل";
   let query = "";
@@ -55,14 +58,9 @@
   let editingCartId = null;
   let pizzaSplit = null;
   let pizzaSliceSheet = null;
+  let customizerQty = 1;
 
   if (year) year.textContent = new Date().getFullYear();
-
-  if (site.phone?.tel) {
-    document.querySelectorAll("[data-site-phone-link]").forEach((link) => {
-      link.href = `tel:${site.phone.tel}`;
-    });
-  }
 
   const formatPrice = (price) => `${price} ₪`;
   const normalize = (value) => String(value || "").trim().toLowerCase();
@@ -75,10 +73,35 @@
     '"': "&quot;",
     "'": "&#39;"
   })[char]);
+  const FALLBACK_IMAGE = "assets/logo-transparent.png";
+  const digitsOnly = (value) => String(value || "").replace(/\D/g, "");
+  const safeTelHref = (value) => {
+    const digits = digitsOnly(value);
+    return digits.length >= 7 && digits.length <= 15 ? `tel:${digits}` : "";
+  };
+  const safeWhatsAppNumber = (value) => {
+    const digits = digitsOnly(value);
+    return digits.length >= 7 && digits.length <= 15 ? digits : "";
+  };
+  const safeLocalAsset = (value, fallback = FALLBACK_IMAGE) => {
+    const path = String(value || "").trim().replace(/\\/g, "/");
+    if (!/^(assets|photos|video)\/[A-Za-z0-9\u0600-\u06FF\u0590-\u05FF _.\-()]+$/u.test(path)) return fallback;
+    if (/(^|\/)\.\.(\/|$)/.test(path)) return fallback;
+    if (!/\.(png|jpe?g|webp|gif|svg|mp4)$/i.test(path)) return fallback;
+    return path;
+  };
+
+  if (site.phone?.tel) {
+    document.querySelectorAll("[data-site-phone-link]").forEach((link) => {
+      const safeHref = safeTelHref(site.phone.tel);
+      if (safeHref) link.href = safeHref;
+    });
+  }
 
   const newCartId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
   const getProduct = (id) => menu.find((product) => product.id === Number(id));
+  const isProductAvailable = (product) => Number(product?.available ?? 1) === 1;
   const isPizzaProduct = (product) => normalize(product?.category) === normalize("بيتسا");
 
   const itemAddonTotal = (item) => {
@@ -115,11 +138,14 @@
       if (!Array.isArray(parsed)) return [];
       // نُبقي فقط العناصر التي ما زال منتجها موجودًا في القائمة الحالية
       return parsed
-        .filter((item) => item && getProduct(item.productId))
+        .filter((item) => {
+          const product = item && getProduct(item.productId);
+          return product && isProductAvailable(product);
+        })
         .map((item) => ({
           cartId: item.cartId || newCartId(),
           productId: Number(item.productId),
-          qty: Math.max(1, Number(item.qty || 1)),
+          qty: Math.min(MAX_ITEM_QTY, Math.max(1, Number(item.qty || 1))),
           removedIngredients: toArray(item.removedIngredients),
           freeAddons: toArray(item.freeAddons),
           paidAddons: toArray(item.paidAddons).map((addon) => ({
@@ -129,6 +155,7 @@
           notes: typeof item.notes === "string" ? item.notes : "",
           splitMode: item.splitMode === "slices" ? "slices" : null,
           pizzaSplitMode: item.pizzaSplitMode || (item.splitMode === "slices" ? "slices" : null),
+          doughType: item.doughType === "رقيق" ? "رقيق" : "عادي",
           sliceCount: Number(item.sliceCount || 0),
           pizzaSections: toArray(item.pizzaSections),
           pizzaAdditions: item.pizzaAdditions || null,
@@ -170,23 +197,26 @@
 
   const createProductCard = (product, index) => {
     const card = document.createElement("article");
-    card.className = "product-card product-row";
+    const available = isProductAvailable(product);
+    card.className = `product-card product-row${available ? "" : " is-unavailable"}`;
     card.dataset.productId = product.id;
-    card.tabIndex = 0;
+    card.tabIndex = available ? 0 : -1;
     card.setAttribute("role", "button");
+    card.setAttribute("aria-disabled", available ? "false" : "true");
     card.style.animationDelay = `${Math.min(index * 45, 360)}ms`;
     const freeAddons = toArray(product.freeAddons);
     const paidAddons = toArray(product.paidAddons);
     const ingredients = toArray(product.ingredients);
 
     card.innerHTML = `
-      <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy" width="520" height="410">
+      <img src="${escapeHTML(safeLocalAsset(product.image))}" alt="${escapeHTML(product.name)}" loading="lazy" width="520" height="410">
       <div class="product-body">
         <span class="category-pill">${escapeHTML(product.category)}</span>
         <div class="product-top">
           <h2>${escapeHTML(product.name)}</h2>
           <span class="price">${escapeHTML(formatPrice(product.price))}</span>
         </div>
+        ${available ? "" : `<span class="unavailable-badge">غير متاح حالياً</span>`}
         <p>${escapeHTML(product.description)}</p>
         <div class="product-options-preview">
           <strong>المكونات</strong>
@@ -194,8 +224,8 @@
           ${freeAddons.length ? `<strong>إضافات مجانية</strong>${createChips(freeAddons, "")}` : ""}
           ${paidAddons.length ? `<strong>إضافات مدفوعة</strong><div class="chips">${paidAddons.map((addon) => `<span>${escapeHTML(addon.name)} +${escapeHTML(formatPrice(addon.price))}</span>`).join("")}</div>` : ""}
         </div>
-        <button class="add-cart-btn product-add" type="button" data-product-id="${product.id}">
-          ${productHasOptions(product) ? "اختيار وتعديل" : "إضافة للسلة"}
+        <button class="add-cart-btn product-add" type="button" data-product-id="${product.id}" ${available ? "" : "disabled"}>
+          ${available ? (productHasOptions(product) ? "اختيار وتعديل" : "إضافة للسلة") : "غير متاح"}
         </button>
       </div>
     `;
@@ -259,7 +289,7 @@
 
   const categoryImage = (category) => {
     const product = menu.find((item) => item.category === category);
-    return product ? product.image : "";
+    return product ? safeLocalAsset(product.image) : FALLBACK_IMAGE;
   };
 
   const CC_SLICE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c4.4 0 8.3 2.4 9 5.8L12 21 3 8.8C3.7 5.4 7.6 3 12 3Z"/><circle cx="9.5" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="13.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`;
@@ -339,6 +369,13 @@
       <p>${escapeHTML(help)}</p>
       <div class="option-list">${checkboxes}</div>
     `;
+  };
+
+  const setCustomizerQty = (value) => {
+    customizerQty = Math.min(MAX_ITEM_QTY, Math.max(1, Number(value || 1)));
+    if (itemQty) itemQty.textContent = String(customizerQty);
+    if (itemQtyMinus) itemQtyMinus.disabled = customizerQty <= 1;
+    if (itemQtyPlus) itemQtyPlus.disabled = customizerQty >= MAX_ITEM_QTY;
   };
 
   const PIZZA_SLICE_COUNTS = [4, 8, 10, 12, 16];
@@ -517,7 +554,8 @@
       descriptors: hydrated.descriptors,
       selections: hydrated.selections,
       sliceCount: hydrated.sliceCount,
-      qty: Math.max(1, Number(cartItem?.qty || 1)),
+      doughType: cartItem?.doughType === "رقيق" ? "رقيق" : "عادي",
+      qty: Math.min(MAX_ITEM_QTY, Math.max(1, Number(cartItem?.qty || 1))),
       notes: cartItem?.notes || "",
       editingCartId: cartItem?.cartId || null
     };
@@ -614,6 +652,14 @@
 
         <div class="pizza-split-controls">
           <div class="pizza-split-field">
+            <span>نوع العجينة</span>
+            <div class="pizza-dough-options" role="radiogroup" aria-label="نوع العجينة">
+              <button type="button" class="pizza-dough-btn ${pizzaSplit.doughType === "رقيق" ? "is-active" : ""}" data-dough-type="رقيق" role="radio" aria-checked="${pizzaSplit.doughType === "رقيق" ? "true" : "false"}">رقيق</button>
+              <button type="button" class="pizza-dough-btn ${pizzaSplit.doughType === "عادي" ? "is-active" : ""}" data-dough-type="عادي" role="radio" aria-checked="${pizzaSplit.doughType === "عادي" ? "true" : "false"}">عادي</button>
+            </div>
+          </div>
+
+          <div class="pizza-split-field">
             <span>عدد القطع</span>
             <div class="pizza-slice-counts">${sliceButtons}</div>
           </div>
@@ -631,9 +677,9 @@
           <div class="pizza-split-bottom">
             <div class="qty-stepper">
               <span>الكمية</span>
-              <button type="button" id="pizzaQtyMinus" aria-label="إنقاص الكمية">−</button>
+              <button type="button" id="pizzaQtyMinus" ${pizzaSplit.qty <= 1 ? "disabled" : ""} aria-label="إنقاص الكمية">−</button>
               <strong id="pizzaQtyValue">${pizzaSplit.qty}</strong>
-              <button type="button" id="pizzaQtyPlus" aria-label="زيادة الكمية">+</button>
+              <button type="button" id="pizzaQtyPlus" ${pizzaSplit.qty >= MAX_ITEM_QTY ? "disabled" : ""} aria-label="زيادة الكمية">+</button>
             </div>
             <div class="pizza-price-box">
               <span>السعر</span>
@@ -659,6 +705,13 @@
       });
     });
 
+    pizzaSplitContent.querySelectorAll("[data-dough-type]").forEach((button) => {
+      button.addEventListener("click", () => {
+        pizzaSplit.doughType = button.dataset.doughType === "رقيق" ? "رقيق" : "عادي";
+        renderPizzaSplit();
+      });
+    });
+
     pizzaSplitContent.querySelectorAll(".pizza-split-chip").forEach((button) => {
       button.addEventListener("click", () => {
         const descriptor = pizzaSplit.descriptors.find((item) => item.scope === button.dataset.scope && item.name === button.dataset.name);
@@ -674,7 +727,7 @@
       renderPizzaSplit();
     });
     pizzaSplitContent.querySelector("#pizzaQtyPlus").addEventListener("click", () => {
-      pizzaSplit.qty += 1;
+      pizzaSplit.qty = Math.min(MAX_ITEM_QTY, pizzaSplit.qty + 1);
       renderPizzaSplit();
     });
     pizzaSplitContent.querySelector("#pizzaSplitSave").addEventListener("click", savePizzaSplit);
@@ -769,6 +822,11 @@
 
   const savePizzaSplit = () => {
     if (!pizzaSplit) return;
+    if (!isProductAvailable(pizzaSplit.product)) {
+      closePizzaSplit();
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
     const productName = pizzaSplit.product.name;
     const isEditing = Boolean(pizzaSplit.editingCartId);
     const price = computePizzaSplitPrice();
@@ -797,6 +855,7 @@
       notes: pizzaSplit.notes.trim(),
       splitMode: "slices",
       pizzaSplitMode: "slices",
+      doughType: pizzaSplit.doughType,
       sliceCount: pizzaSplit.sliceCount,
       pizzaSections: sections,
       pizzaAdditions,
@@ -818,6 +877,10 @@
   };
 
   const openProductPicker = (product, cartItem = null) => {
+    if (!isProductAvailable(product)) {
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
     if (isPizzaProduct(product)) {
       openPizzaSplit(product, cartItem);
       return;
@@ -828,14 +891,14 @@
   const openCustomizer = (product, cartItem = null) => {
     activeProduct = product;
     editingCartId = cartItem?.cartId || null;
-    customizerImage.src = product.image;
+    customizerImage.src = safeLocalAsset(product.image);
     customizerImage.alt = product.name;
     customizerCategory.textContent = product.category;
     customizerTitle.textContent = product.name;
     customizerDescription.textContent = product.description;
     customizerPrice.textContent = `السعر الأساسي: ${formatPrice(product.price)}`;
     itemNotes.value = cartItem?.notes || "";
-    itemQty.value = cartItem?.qty || 1;
+    setCustomizerQty(cartItem?.qty || 1);
 
     renderOptionGroup({
       container: ingredientsOptions,
@@ -899,6 +962,10 @@
 
   /* إضافة مباشرة للمنتجات التي لا تحتوي خيارات (مثل المشروبات) */
   const addSimpleProduct = (product) => {
+    if (!isProductAvailable(product)) {
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
     const existing = cart.find((item) =>
       item.productId === product.id &&
       !item.removedIngredients.length &&
@@ -909,7 +976,7 @@
     );
 
     if (existing) {
-      existing.qty += 1;
+      existing.qty = Math.min(MAX_ITEM_QTY, existing.qty + 1);
     } else {
       cart.push({
         cartId: newCartId(),
@@ -920,6 +987,7 @@
         paidAddons: [],
         notes: "",
         splitMode: null,
+        doughType: null,
         sliceCount: 0,
         pizzaSections: [],
         sliceSummary: [],
@@ -934,6 +1002,11 @@
 
   const saveItem = () => {
     if (!activeProduct) return;
+    if (!isProductAvailable(activeProduct)) {
+      closeModal();
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
 
     const productName = activeProduct.name;
     const isEditing = Boolean(editingCartId);
@@ -941,12 +1014,13 @@
     const item = {
       cartId: editingCartId || newCartId(),
       productId: activeProduct.id,
-      qty: Math.max(1, Number(itemQty.value || 1)),
+      qty: customizerQty,
       removedIngredients: checkedValues("removedIngredients"),
       freeAddons: checkedValues("freeAddons"),
       paidAddons: checkedPaidAddons(),
       notes: itemNotes.value.trim(),
       splitMode: null,
+      doughType: null,
       sliceCount: 0,
       pizzaSections: [],
       sliceSummary: [],
@@ -1082,6 +1156,7 @@
     const details = [];
     if (item.splitMode === "slices") {
       const product = getProduct(item.productId);
+      details.push(`نوع العجينة: ${item.doughType || "عادي"}`);
       const pizzaDetails = renderPizzaSliceDetails(item, product);
       if (pizzaDetails) details.push(pizzaDetails);
       if (item.sliceAddonsCost) details.push(`<p>تكلفة الإضافات المختارة: +${escapeHTML(formatPrice(item.sliceAddonsCost))} للوحدة</p>`);
@@ -1102,6 +1177,7 @@
 
     const lines = [
       "   🍕 تفاصيل شرائح البيتسا:",
+      `   نوع العجينة: ${item.doughType || "عادي"}`,
       `   عدد القطع: ${sections.length}`
     ];
 
@@ -1128,6 +1204,10 @@
   };
 
   const renderCart = () => {
+    cart = cart.filter((item) => {
+      const product = getProduct(item.productId);
+      return product && isProductAvailable(product);
+    });
     const fragment = document.createDocumentFragment();
     let total = 0;
     let count = 0;
@@ -1151,9 +1231,9 @@
         <div class="cart-item-details">${renderItemDetails(item)}</div>
         <div class="cart-item-foot">
           <div class="qty-control">
-            <button type="button" data-dec-id="${escapeHTML(item.cartId)}" aria-label="إنقاص الكمية">−</button>
+            <button type="button" data-dec-id="${escapeHTML(item.cartId)}" ${Number(item.qty || 1) <= 1 ? "disabled" : ""} aria-label="إنقاص الكمية">−</button>
             <span class="qty-value">${escapeHTML(item.qty)}</span>
-            <button type="button" data-inc-id="${escapeHTML(item.cartId)}" aria-label="زيادة الكمية">+</button>
+            <button type="button" data-inc-id="${escapeHTML(item.cartId)}" ${Number(item.qty || 1) >= MAX_ITEM_QTY ? "disabled" : ""} aria-label="زيادة الكمية">+</button>
           </div>
           <div class="cart-actions">
             <button type="button" data-edit-id="${escapeHTML(item.cartId)}">تعديل</button>
@@ -1180,7 +1260,7 @@
   const changeQty = (cartId, delta) => {
     const item = cart.find((cartItem) => cartItem.cartId === cartId);
     if (!item) return;
-    item.qty = Math.max(1, Number(item.qty || 1) + delta);
+      item.qty = Math.min(MAX_ITEM_QTY, Math.max(1, Number(item.qty || 1) + delta));
     renderCart();
   };
 
@@ -1214,9 +1294,10 @@
       return;
     }
     const text = encodeURIComponent(buildOrderText());
-    const whatsapp = site.phone?.whatsapp;
+    const whatsapp = safeWhatsAppNumber(site.phone?.whatsapp);
     if (whatsapp) {
-      window.open(`https://wa.me/${whatsapp}?text=${text}`, "_blank", "noopener");
+      const win = window.open(`https://wa.me/${whatsapp}?text=${text}`, "_blank", "noopener,noreferrer");
+      if (win) win.opener = null;
       showToast("تم تجهيز طلبك، أكمل الإرسال عبر واتساب.");
     } else {
       showToast("تم تجهيز ملخص الطلب.");
@@ -1228,6 +1309,10 @@
     if (!button) return;
     const product = getProduct(button.dataset.productId);
     if (!product) return;
+    if (!isProductAvailable(product)) {
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
     openProductPicker(product);
   });
 
@@ -1237,7 +1322,12 @@
     if (!row) return;
     event.preventDefault();
     const product = getProduct(row.dataset.productId);
-    if (product) openProductPicker(product);
+    if (!product) return;
+    if (!isProductAvailable(product)) {
+      showToast("هذا الصنف غير متاح حالياً.", "error");
+      return;
+    }
+    openProductPicker(product);
   });
 
   cartItems.addEventListener("click", (event) => {
@@ -1249,7 +1339,8 @@
     if (editButton) {
       const item = cart.find((cartItem) => cartItem.cartId === editButton.dataset.editId);
       const product = item ? getProduct(item.productId) : null;
-      if (product && item) openProductPicker(product, item);
+      if (product && item && isProductAvailable(product)) openProductPicker(product, item);
+      else if (product) showToast("هذا الصنف غير متاح حالياً.", "error");
     }
 
     if (removeButton) {
@@ -1291,6 +1382,14 @@
 
   closeCustomizer.addEventListener("click", closeModal);
   saveCartItem.addEventListener("click", saveItem);
+  if (itemQtyMinus) itemQtyMinus.addEventListener("click", () => setCustomizerQty(customizerQty - 1));
+  if (itemQtyPlus) itemQtyPlus.addEventListener("click", () => {
+    if (customizerQty >= MAX_ITEM_QTY) {
+      showToast(`الحد الأقصى للكمية هو ${MAX_ITEM_QTY}.`, "error");
+      return;
+    }
+    setCustomizerQty(customizerQty + 1);
+  });
   if (pizzaSplitClose) pizzaSplitClose.addEventListener("click", closePizzaSplit);
   customizer.addEventListener("click", (event) => {
     if (event.target === customizer) closeModal();

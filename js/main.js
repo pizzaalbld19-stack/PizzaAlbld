@@ -6,6 +6,49 @@
 
   const formatPrice = (price) => `${price} ₪`;
 
+  const FALLBACK_IMAGE = "assets/logo-transparent.png";
+  const ALLOWED_EXTERNAL_HOSTS = new Set([
+    "instagram.com",
+    "www.instagram.com",
+    "wa.me",
+    "maps.app.goo.gl",
+    "www.google.com",
+    "maps.google.com",
+    "oh-tech.co",
+    "www.oh-tech.co"
+  ]);
+
+  const digitsOnly = (value) => String(value || "").replace(/\D/g, "");
+
+  const safeExternalUrl = (value) => {
+    try {
+      const url = new URL(String(value || ""));
+      if (url.protocol !== "https:") return "";
+      if (!ALLOWED_EXTERNAL_HOSTS.has(url.hostname)) return "";
+      return url.href;
+    } catch (error) {
+      return "";
+    }
+  };
+
+  const safeTelHref = (value) => {
+    const digits = digitsOnly(value);
+    return digits.length >= 7 && digits.length <= 15 ? `tel:${digits}` : "";
+  };
+
+  const safeWhatsAppHref = (value) => {
+    const digits = digitsOnly(value);
+    return digits.length >= 7 && digits.length <= 15 ? `https://wa.me/${digits}` : "";
+  };
+
+  const safeLocalAsset = (value, fallback = FALLBACK_IMAGE) => {
+    const path = String(value || "").trim().replace(/\\/g, "/");
+    if (!/^(assets|photos|video)\/[A-Za-z0-9\u0600-\u06FF\u0590-\u05FF _.\-()]+$/u.test(path)) return fallback;
+    if (/(^|\/)\.\.(\/|$)/.test(path)) return fallback;
+    if (!/\.(png|jpe?g|webp|gif|svg|mp4)$/i.test(path)) return fallback;
+    return path;
+  };
+
   const setText = (selector, value) => {
     if (value == null) return;
     document.querySelectorAll(selector).forEach((element) => {
@@ -22,24 +65,25 @@
 
   const applySiteData = () => {
     if (site.phone) {
-      setHref("[data-site-phone-link]", `tel:${site.phone.tel}`);
+      setHref("[data-site-phone-link]", safeTelHref(site.phone.tel));
       setText("[data-site-phone]", site.phone.display);
     }
 
     if (site.phone?.whatsapp) {
-      setHref("[data-site-whatsapp]", `https://wa.me/${site.phone.whatsapp}`);
+      setHref("[data-site-whatsapp]", safeWhatsAppHref(site.phone.whatsapp));
     }
 
     if (site.instagram) {
-      setHref("[data-site-instagram]", site.instagram.url);
+      setHref("[data-site-instagram]", safeExternalUrl(site.instagram.url));
       setText("[data-site-instagram-handle]", site.instagram.handle);
     }
 
     if (site.location) {
       setText("[data-site-location]", site.location.display);
-      setHref("[data-site-map-link]", site.location.mapUrl);
+      setHref("[data-site-map-link]", safeExternalUrl(site.location.mapUrl));
       document.querySelectorAll("[data-site-map-embed]").forEach((frame) => {
-        frame.src = site.location.embedUrl;
+        const safeEmbed = safeExternalUrl(site.location.embedUrl);
+        if (safeEmbed) frame.src = safeEmbed;
       });
     }
 
@@ -61,7 +105,7 @@
       const price = card.querySelector("strong");
 
       if (image) {
-        image.src = product.image;
+        image.src = safeLocalAsset(product.image);
         image.alt = product.name;
       }
       if (title) title.textContent = product.name;
@@ -101,6 +145,12 @@
   applyFeaturedProducts();
   updateSchema();
 
+  document.querySelectorAll("[data-scroll-top]").forEach((button) => {
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
   const lightbox = document.getElementById("lightbox");
   if (lightbox) {
     const lightboxImage = lightbox.querySelector("img");
@@ -108,9 +158,10 @@
 
     document.querySelectorAll("[data-lightbox]").forEach((item) => {
       item.addEventListener("click", () => {
-        const src = item.getAttribute("data-lightbox");
+        const src = safeLocalAsset(item.getAttribute("data-lightbox"), "");
+        if (!src) return;
         const alt = item.querySelector("img")?.alt || "";
-      lightboxImage.src = src;
+        lightboxImage.src = src;
         lightboxImage.alt = alt;
         lightbox.classList.add("is-open");
         lightbox.setAttribute("aria-hidden", "false");
