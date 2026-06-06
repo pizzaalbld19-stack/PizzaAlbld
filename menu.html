@@ -164,6 +164,18 @@
     </div>
   </div>
 
+  <div class="order-confirm-modal" id="orderConfirmModal" aria-hidden="true">
+    <div class="order-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="orderConfirmTitle">
+      <span class="category-pill">تأكيد الإرسال</span>
+      <h2 id="orderConfirmTitle">الرجاء تأكيد الطلب</h2>
+      <p>سيتم فتح واتساب لإرسال ملخص الطلب إلى المطعم. الطلب لا يتم تحضيره إلا بعد تأكيد المطعم.</p>
+      <div class="order-confirm-actions">
+        <button class="order-confirm-reject" id="rejectOrderConfirm" type="button">رفض</button>
+        <button class="order-confirm-accept" id="acceptOrderConfirm" type="button">تأكيد</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
     <p class="credit-line">تم تطوير الموقع في شركة  <a href="https://oh-tech.co" target="_blank" rel="noopener noreferrer">O&amp;H Tech</a></p>
@@ -175,7 +187,7 @@
 
   <script src="data/site.js"></script>
   <script src="data/menu.js?v=20260606-availability"></script>
-  <script src="js/menu.js?v=20260606-whatsapp-message-format" defer></script>
+  <script src="js/menu.js?v=20260606-whatsapp-confirm" defer></script>
   <script src="js/accessibility.js?v=20260606-a11y" defer></script>
 </body>
 </html>

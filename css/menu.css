@@ -1042,7 +1042,8 @@
 
 /* Pizza slice-split experience */
 .pizza-split-modal,
-.pizza-slice-sheet {
+.pizza-slice-sheet,
+.order-confirm-modal {
   position: fixed;
   inset: 0;
   z-index: 1100;
@@ -1056,7 +1057,8 @@
 }
 
 .pizza-split-modal::before,
-.pizza-slice-sheet-backdrop {
+.pizza-slice-sheet-backdrop,
+.order-confirm-modal::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1065,7 +1067,8 @@
 }
 
 .pizza-split-modal.is-open,
-.pizza-slice-sheet.is-open {
+.pizza-slice-sheet.is-open,
+.order-confirm-modal.is-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
