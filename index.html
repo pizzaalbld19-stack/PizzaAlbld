@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/main.css?v=20260606-location-inline-actions">
   <link rel="stylesheet" href="css/animations.css?v=20260601-logo-loader">
   <link rel="stylesheet" href="css/responsive.css?v=20260606-location-inline-actions">
-  <link rel="stylesheet" href="css/enhancements.css?v=20260606-audio-toggle">
+  <link rel="stylesheet" href="css/enhancements.css?v=20260606-clear-utensils-icon">
   <link rel="stylesheet" href="css/accessibility.css?v=20260606-a11y-left">
   <script type="application/ld+json">
     {
@@ -248,26 +248,28 @@
 
   </div>
 
-  <button class="audio-toggle" type="button" data-audio-toggle aria-pressed="false" aria-label="تشغيل الأنشودة">
-    <span class="audio-toggle-icon" aria-hidden="true">♪</span>
-    <span class="audio-toggle-text">الأنشودة</span>
-  </button>
   <audio id="siteAudio" preload="metadata" loop>
     <source src="audio/بيتْسَا البلد.mp3.mpeg" type="audio/mpeg">
   </audio>
 
   <div class="side-actions" aria-label="اختصارات الموقع">
     <a class="side-action side-action-menu" href="menu.html" aria-label="الانتقال إلى القائمة">
-      <span>القائمة</span>
+      <svg class="menu-tools-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <path class="menu-tool-stroke" d="M17 5v14M12 5v14M22 5v14M12 19h10M17 19v24" />
+        <path class="menu-tool-stroke" d="M33 5c-5 6-6 12-3 17l3 4v17M33 5v21" />
+      </svg>
     </a>
+    <button class="side-action audio-toggle" type="button" data-audio-toggle aria-pressed="false" aria-label="تشغيل الأنشودة">
+      <span class="audio-toggle-icon" aria-hidden="true">♪</span>
+    </button>
     <button class="side-action side-action-top" type="button" data-scroll-top aria-label="الصعود إلى أعلى الصفحة">
-      <span aria-hidden="true">↑</span>
+      <span class="top-arrow" aria-hidden="true"></span>
     </button>
   </div>
 
   <script src="data/site.js?v=20260606-waze"></script>
   <script src="data/menu.js"></script>
-  <script src="js/main.js?v=20260606-audio-toggle" defer></script>
+  <script src="js/main.js?v=20260606-menu-book-action" defer></script>
   <script src="js/animations.js?v=20260601-logo-loader" defer></script>
   <script src="js/accessibility.js?v=20260606-a11y" defer></script>
 </body>

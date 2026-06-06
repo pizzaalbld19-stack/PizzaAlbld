@@ -1128,18 +1128,90 @@ body {
 
 .side-action-menu {
   color: #ffd26a;
-  line-height: 1.15;
-  text-align: center;
   background:
     linear-gradient(145deg, rgba(255, 209, 97, .16), rgba(255, 255, 255, .04)),
     radial-gradient(circle at 20% 12%, rgba(255, 214, 122, .28), transparent 48%),
     rgba(22, 13, 9, .58);
 }
 
+.menu-tools-icon {
+  display: block;
+  width: 36px;
+  height: 36px;
+  overflow: visible;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, .32));
+  animation: utensilSway 2.4s ease-in-out infinite;
+}
+
+.menu-tool-stroke {
+  fill: none;
+  stroke: #ffd26a;
+  stroke-width: 4.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.side-action-menu:hover .menu-tools-icon,
+.side-action-menu:focus-visible .menu-tools-icon {
+  animation: utensilsPop .55s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes utensilSway {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-2deg); }
+}
+
+@keyframes utensilsPop {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.12) rotate(-3deg); }
+}
+
 .side-action-top {
   color: #ffd26a;
-  font-size: 26px;
-  font-weight: 900;
+  background:
+    linear-gradient(145deg, rgba(255, 209, 97, .14), rgba(255, 255, 255, .045)),
+    radial-gradient(circle at 50% 22%, rgba(255, 214, 122, .26), transparent 44%),
+    rgba(18, 12, 9, .58);
+  animation: sideActionFloat 3.8s ease-in-out infinite, topArrowGlow 2.6s ease-in-out infinite;
+}
+
+.top-arrow {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, rgba(255, 211, 123, .18), rgba(255, 211, 123, .04) 62%, transparent);
+  animation: topArrowLift 1.8s ease-in-out infinite;
+}
+
+.top-arrow::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-top: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+  border-radius: 3px 0 0 0;
+  transform: translateX(-50%) rotate(45deg);
+  filter: drop-shadow(0 3px 8px rgba(255, 210, 106, .38));
+}
+
+.top-arrow::after {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  width: 3px;
+  height: 15px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, currentColor, rgba(255, 210, 106, .08));
+  box-shadow: 0 0 14px rgba(255, 210, 106, .28);
+  transform: translateX(-50%);
 }
 
 .side-action:hover,
@@ -1166,22 +1238,41 @@ body {
   50% { translate: 0 -5px; }
 }
 
+@keyframes topArrowLift {
+  0%, 100% { transform: translateY(2px); opacity: .9; }
+  45% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes topArrowGlow {
+  0%, 100% {
+    box-shadow:
+      0 18px 45px rgba(0, 0, 0, .38),
+      inset 0 1px 0 rgba(255, 255, 255, .2),
+      inset 0 -1px 0 rgba(255, 197, 84, .08);
+  }
+  50% {
+    box-shadow:
+      0 22px 54px rgba(0, 0, 0, .44),
+      0 0 0 5px rgba(255, 211, 123, .06),
+      inset 0 1px 0 rgba(255, 255, 255, .24);
+  }
+}
+
 @media (max-width: 640px) {
   .side-actions {
     right: 12px;
     left: auto;
     top: auto;
     bottom: 18px;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(18px) scale(.96);
-    transition: opacity .28s ease, transform .28s ease;
-  }
-
-  .side-actions.is-visible {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0) scale(1);
+    transition: opacity .28s ease, transform .28s ease;
+  }
+
+  .side-actions:not(.is-visible) .side-action-menu,
+  .side-actions:not(.is-visible) .side-action-top {
+    display: none;
   }
 
   .side-action {
@@ -1195,6 +1286,11 @@ body {
   .side-action-menu {
     font-size: 12px;
   }
+
+  .menu-tools-icon {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1203,6 +1299,12 @@ body {
   }
 
   .side-action {
+    animation: none;
+  }
+
+  .menu-tools-icon,
+  .side-action-menu:hover .menu-tools-icon,
+  .side-action-menu:focus-visible .menu-tools-icon {
     animation: none;
   }
 }
@@ -1769,36 +1871,18 @@ body {
   }
 }
 
-/* ---------- Optional site audio ---------- */
-.audio-toggle {
-  position: fixed;
-  left: 16px;
-  bottom: 84px;
-  z-index: 2180;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 50px;
-  padding: 0 14px;
-  border: 1px solid rgba(255, 211, 123, .34);
-  border-radius: 15px;
-  color: #ffd36f;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)),
-    rgba(20, 14, 10, .76);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .12);
-  backdrop-filter: blur(16px);
-  font: inherit;
-  font-weight: 900;
-  cursor: pointer;
-  transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease, background .24s ease;
+/* ---------- Optional site audio inside side actions ---------- */
+.side-actions .audio-toggle {
+  color: #ffd26a;
+  font-size: 25px;
+  animation: sideActionFloat 3.8s ease-in-out infinite, audioInvitePulse 2.2s ease-in-out infinite;
 }
 
-.audio-toggle::after {
-  content: "تشغيل الأنشودة";
+.side-actions .audio-toggle::after {
+  content: "تشغيل الصوت";
   position: absolute;
-  left: 0;
-  bottom: calc(100% + 10px);
+  right: calc(100% + 10px);
+  top: 50%;
   min-width: max-content;
   padding: 7px 10px;
   border: 1px solid rgba(255, 211, 123, .34);
@@ -1808,67 +1892,70 @@ body {
   box-shadow: 0 14px 34px rgba(0, 0, 0, .32);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(4px);
+  transform: translate(4px, -50%);
   transition: opacity .2s ease, transform .2s ease;
   font-size: 12px;
   white-space: nowrap;
 }
 
-.audio-toggle:hover,
-.audio-toggle:focus-visible {
-  transform: translateY(-2px) scale(1.02);
-  border-color: rgba(255, 211, 123, .62);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, .44), 0 0 0 4px rgba(255, 211, 123, .08);
-}
-
-.audio-toggle:hover::after,
-.audio-toggle:focus-visible::after {
+.side-actions .audio-toggle:hover::after,
+.side-actions .audio-toggle:focus-visible::after {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(0, -50%);
 }
 
-.audio-toggle[aria-pressed="true"] {
+.side-actions .audio-toggle[aria-pressed="true"] {
   color: #170c07;
   border-color: rgba(255, 211, 123, .78);
-  background: linear-gradient(135deg, #ffd36f, #d9472f);
+  background:
+    linear-gradient(135deg, #ffd36f, #d9472f),
+    rgba(22, 13, 9, .66);
+  animation: audioDance .72s ease-in-out infinite;
 }
 
-.audio-toggle[aria-pressed="true"]::after {
-  content: "إيقاف الأنشودة";
+.side-actions .audio-toggle[aria-pressed="true"]::after {
+  content: "إيقاف الصوت";
 }
 
 .audio-toggle-icon {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(255, 211, 123, .14);
-  font-size: 18px;
   line-height: 1;
 }
 
-.audio-toggle[aria-pressed="true"] .audio-toggle-icon {
+.side-actions .audio-toggle[aria-pressed="true"] .audio-toggle-icon {
   background: rgba(23, 12, 7, .14);
 }
 
-@media (max-width: 640px) {
-  .audio-toggle {
-    left: 12px;
-    bottom: 82px;
-    min-height: 50px;
-    width: 50px;
-    justify-content: center;
-    padding: 0;
-    border-radius: 14px;
+@keyframes audioInvitePulse {
+  0%, 100% {
+    box-shadow:
+      0 18px 45px rgba(0, 0, 0, .38),
+      0 0 0 0 rgba(255, 211, 123, .28),
+      inset 0 1px 0 rgba(255, 255, 255, .2);
   }
+  50% {
+    box-shadow:
+      0 22px 54px rgba(0, 0, 0, .44),
+      0 0 0 7px rgba(255, 211, 123, 0),
+      inset 0 1px 0 rgba(255, 255, 255, .26);
+  }
+}
 
-  .audio-toggle-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+@keyframes audioDance {
+  0%, 100% { transform: rotate(0deg) translateY(0) scale(1); }
+  25% { transform: rotate(-7deg) translateY(-3px) scale(1.04); }
+  50% { transform: rotate(6deg) translateY(1px) scale(.99); }
+  75% { transform: rotate(-4deg) translateY(-2px) scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-actions .audio-toggle,
+  .side-actions .audio-toggle[aria-pressed="true"] {
+    animation: none;
   }
 }
