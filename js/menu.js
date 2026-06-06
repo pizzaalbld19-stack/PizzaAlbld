@@ -20,6 +20,9 @@
   const cartFloatCount = document.getElementById("cartFloatCount");
   const cartFloatTotal = document.getElementById("cartFloatTotal");
   const checkoutOrder = document.getElementById("checkoutOrder");
+  const orderConfirmModal = document.getElementById("orderConfirmModal");
+  const rejectOrderConfirm = document.getElementById("rejectOrderConfirm");
+  const acceptOrderConfirm = document.getElementById("acceptOrderConfirm");
   const toastStack = document.getElementById("toastStack");
   const customizer = document.getElementById("customizer");
   const closeCustomizer = document.getElementById("closeCustomizer");
@@ -1296,11 +1299,23 @@
     return lines.join("\n");
   };
 
-  const checkout = () => {
-    if (!cart.length) {
-      showToast("السلة فارغة، أضف أصنافاً أولاً.", "error");
+  const openOrderConfirm = () => {
+    if (!orderConfirmModal) {
+      sendOrderToWhatsApp();
       return;
     }
+    orderConfirmModal.classList.add("is-open");
+    orderConfirmModal.setAttribute("aria-hidden", "false");
+    acceptOrderConfirm?.focus();
+  };
+
+  const closeOrderConfirm = () => {
+    if (!orderConfirmModal) return;
+    orderConfirmModal.classList.remove("is-open");
+    orderConfirmModal.setAttribute("aria-hidden", "true");
+  };
+
+  const sendOrderToWhatsApp = () => {
     const text = encodeURIComponent(buildOrderText());
     const whatsapp = safeWhatsAppNumber(site.phone?.whatsapp);
     if (whatsapp) {
@@ -1310,6 +1325,14 @@
     } else {
       showToast("تم تجهيز ملخص الطلب.");
     }
+  };
+
+  const checkout = () => {
+    if (!cart.length) {
+      showToast("السلة فارغة، أضف أصنافاً أولاً.", "error");
+      return;
+    }
+    openOrderConfirm();
   };
 
   grid.addEventListener("click", (event) => {
@@ -1374,6 +1397,16 @@
   });
 
   if (checkoutOrder) checkoutOrder.addEventListener("click", checkout);
+  if (rejectOrderConfirm) rejectOrderConfirm.addEventListener("click", closeOrderConfirm);
+  if (acceptOrderConfirm) {
+    acceptOrderConfirm.addEventListener("click", () => {
+      closeOrderConfirm();
+      sendOrderToWhatsApp();
+      cart = [];
+      renderCart();
+      closeCart();
+    });
+  }
 
   cartToggle.addEventListener("click", openCart);
   cartClose.addEventListener("click", closeCart);
@@ -1407,9 +1440,18 @@
       if (event.target === pizzaSplitModal) closePizzaSplit();
     });
   }
+  if (orderConfirmModal) {
+    orderConfirmModal.addEventListener("click", (event) => {
+      if (event.target === orderConfirmModal) closeOrderConfirm();
+    });
+  }
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && pizzaSliceSheet) {
       closePizzaSliceSheet();
+      return;
+    }
+    if (event.key === "Escape" && orderConfirmModal?.classList.contains("is-open")) {
+      closeOrderConfirm();
       return;
     }
     if (event.key === "Escape" && pizzaSplitModal?.classList.contains("is-open")) closePizzaSplit();
