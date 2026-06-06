@@ -1768,3 +1768,107 @@ body {
     transform: none;
   }
 }
+
+/* ---------- Optional site audio ---------- */
+.audio-toggle {
+  position: fixed;
+  left: 16px;
+  bottom: 84px;
+  z-index: 2180;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 211, 123, .34);
+  border-radius: 15px;
+  color: #ffd36f;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)),
+    rgba(20, 14, 10, .76);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .36), inset 0 1px 0 rgba(255, 255, 255, .12);
+  backdrop-filter: blur(16px);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease, background .24s ease;
+}
+
+.audio-toggle::after {
+  content: "تشغيل الأنشودة";
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  min-width: max-content;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 211, 123, .34);
+  border-radius: 10px;
+  color: #fff7e8;
+  background: rgba(18, 13, 10, .94);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .32);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity .2s ease, transform .2s ease;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.audio-toggle:hover,
+.audio-toggle:focus-visible {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(255, 211, 123, .62);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, .44), 0 0 0 4px rgba(255, 211, 123, .08);
+}
+
+.audio-toggle:hover::after,
+.audio-toggle:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.audio-toggle[aria-pressed="true"] {
+  color: #170c07;
+  border-color: rgba(255, 211, 123, .78);
+  background: linear-gradient(135deg, #ffd36f, #d9472f);
+}
+
+.audio-toggle[aria-pressed="true"]::after {
+  content: "إيقاف الأنشودة";
+}
+
+.audio-toggle-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 211, 123, .14);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.audio-toggle[aria-pressed="true"] .audio-toggle-icon {
+  background: rgba(23, 12, 7, .14);
+}
+
+@media (max-width: 640px) {
+  .audio-toggle {
+    left: 12px;
+    bottom: 82px;
+    min-height: 50px;
+    width: 50px;
+    justify-content: center;
+    padding: 0;
+    border-radius: 14px;
+  }
+
+  .audio-toggle-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

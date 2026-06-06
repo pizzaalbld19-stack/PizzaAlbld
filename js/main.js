@@ -197,6 +197,55 @@
     });
   });
 
+  const siteAudio = document.getElementById("siteAudio");
+  const audioToggle = document.querySelector("[data-audio-toggle]");
+  if (siteAudio && audioToggle) {
+    const AUDIO_PREF_KEY = "pizzaBaladAudioEnabled";
+    siteAudio.volume = 0.42;
+
+    const setAudioState = (isPlaying) => {
+      audioToggle.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+      audioToggle.setAttribute("aria-label", isPlaying ? "إيقاف الأنشودة" : "تشغيل الأنشودة");
+    };
+
+    const playAudio = async () => {
+      try {
+        await siteAudio.play();
+        setAudioState(true);
+        localStorage.setItem(AUDIO_PREF_KEY, "1");
+      } catch (error) {
+        setAudioState(false);
+      }
+    };
+
+    const pauseAudio = () => {
+      siteAudio.pause();
+      setAudioState(false);
+      localStorage.setItem(AUDIO_PREF_KEY, "0");
+    };
+
+    audioToggle.addEventListener("click", () => {
+      if (siteAudio.paused) {
+        playAudio();
+      } else {
+        pauseAudio();
+      }
+    });
+
+    siteAudio.addEventListener("pause", () => setAudioState(false));
+    siteAudio.addEventListener("play", () => setAudioState(true));
+
+    if (localStorage.getItem(AUDIO_PREF_KEY) === "1") {
+      const resumeAfterInteraction = () => {
+        playAudio();
+        document.removeEventListener("pointerdown", resumeAfterInteraction);
+        document.removeEventListener("keydown", resumeAfterInteraction);
+      };
+      document.addEventListener("pointerdown", resumeAfterInteraction, { once: true });
+      document.addEventListener("keydown", resumeAfterInteraction, { once: true });
+    }
+  }
+
   const lightbox = document.getElementById("lightbox");
   if (lightbox) {
     const lightboxImage = lightbox.querySelector("img");
