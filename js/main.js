@@ -164,8 +164,11 @@
   }
 
   document.querySelectorAll("[data-scroll-top]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
+      document.documentElement.scrollTo?.({ top: 0, behavior: "smooth" });
+      document.body.scrollTo?.({ top: 0, behavior: "smooth" });
     });
   });
 

@@ -1,6 +1,7 @@
 .skip-link {
   position: fixed;
-  inset-inline-start: 16px;
+  left: 16px;
+  right: auto;
   top: 12px;
   z-index: 3000;
   padding: 10px 14px;
@@ -20,7 +21,8 @@
 
 .a11y-widget {
   position: fixed;
-  inset-inline-start: 16px;
+  left: 16px;
+  right: auto;
   bottom: 18px;
   z-index: 2200;
   font-family: Cairo, Arial, sans-serif;
@@ -54,7 +56,8 @@
 .a11y-toggle::after {
   content: "زر الوصول";
   position: absolute;
-  inset-inline-start: 0;
+  left: 0;
+  right: auto;
   bottom: calc(100% + 10px);
   min-width: max-content;
   padding: 7px 10px;
@@ -89,7 +92,8 @@
 
 .a11y-panel {
   position: absolute;
-  inset-inline-start: 0;
+  left: 0;
+  right: auto;
   bottom: 66px;
   width: min(300px, calc(100vw - 32px));
   padding: 14px;
@@ -236,7 +240,8 @@ html.a11y-reduce-motion *::after {
 
 @media (max-width: 640px) {
   .a11y-widget {
-    inset-inline-start: 12px;
+    left: 12px;
+    right: auto;
     bottom: 18px;
   }
 
