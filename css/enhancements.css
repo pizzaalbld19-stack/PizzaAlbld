@@ -1102,10 +1102,10 @@ body {
 .side-action {
   display: inline-grid;
   place-items: center;
-  width: 62px;
-  height: 62px;
-  min-width: 62px;
-  min-height: 62px;
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  min-height: 54px;
   border: 1px solid rgba(255, 211, 123, .24);
   border-radius: 16px;
   color: #fff7e8;
@@ -1172,23 +1172,36 @@ body {
     left: auto;
     top: auto;
     bottom: 18px;
-    transform: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px) scale(.96);
+    transition: opacity .28s ease, transform .28s ease;
+  }
+
+  .side-actions.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
   }
 
   .side-action {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
-    min-height: 54px;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     border-radius: 14px;
   }
 
   .side-action-menu {
-    font-size: 13px;
+    font-size: 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .side-actions {
+    transition: none;
+  }
+
   .side-action {
     animation: none;
   }

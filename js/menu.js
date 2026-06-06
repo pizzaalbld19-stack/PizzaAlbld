@@ -1296,7 +1296,7 @@
     const text = encodeURIComponent(buildOrderText());
     const whatsapp = safeWhatsAppNumber(site.phone?.whatsapp);
     if (whatsapp) {
-      const win = window.open(`https://wa.me/${whatsapp}?text=${text}`, "_blank", "noopener,noreferrer");
+      const win = window.open(`https://api.whatsapp.com/send?phone=${whatsapp}&text=${text}`, "_blank", "noopener,noreferrer");
       if (win) win.opener = null;
       showToast("تم تجهيز طلبك، أكمل الإرسال عبر واتساب.");
     } else {

@@ -6,7 +6,7 @@ This project is a static restaurant website. It has no backend, no database, no 
 
 - User-controlled menu/site data is rendered with `textContent` or escaped before `innerHTML`.
 - Product image paths are allowlisted to local `assets/`, `photos/`, and `video/` folders.
-- External URLs are allowlisted for WhatsApp, Instagram, Google Maps, and O&H Tech.
+- External URLs are allowlisted for WhatsApp, WhatsApp Business compatible links, Instagram, Google Maps, Waze, and O&H Tech.
 - Phone and WhatsApp values are reduced to digits and length-checked before use.
 - `target="_blank"` links use `rel="noopener noreferrer"`.
 - Pages include a restrictive static Content Security Policy where possible.
@@ -54,4 +54,3 @@ When editing `data/menu.js` or `data/site.js`:
 - Use only local image paths such as `photos/item.jpg`.
 - Use `available: 1` for available products and `available: 0` for unavailable products.
 - Keep phone and WhatsApp values as digits only.
-

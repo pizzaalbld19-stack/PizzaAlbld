@@ -11,7 +11,11 @@
     "instagram.com",
     "www.instagram.com",
     "wa.me",
+    "api.whatsapp.com",
+    "www.whatsapp.com",
     "maps.app.goo.gl",
+    "waze.com",
+    "www.waze.com",
     "www.google.com",
     "maps.google.com",
     "oh-tech.co",
@@ -38,7 +42,7 @@
 
   const safeWhatsAppHref = (value) => {
     const digits = digitsOnly(value);
-    return digits.length >= 7 && digits.length <= 15 ? `https://wa.me/${digits}` : "";
+    return digits.length >= 7 && digits.length <= 15 ? `https://api.whatsapp.com/send?phone=${digits}` : "";
   };
 
   const safeLocalAsset = (value, fallback = FALLBACK_IMAGE) => {
@@ -81,6 +85,7 @@
     if (site.location) {
       setText("[data-site-location]", site.location.display);
       setHref("[data-site-map-link]", safeExternalUrl(site.location.mapUrl));
+      setHref("[data-site-waze-link]", safeExternalUrl(site.location.wazeUrl));
       document.querySelectorAll("[data-site-map-embed]").forEach((frame) => {
         const safeEmbed = safeExternalUrl(site.location.embedUrl);
         if (safeEmbed) frame.src = safeEmbed;
@@ -144,6 +149,19 @@
   applySiteData();
   applyFeaturedProducts();
   updateSchema();
+
+  const sideActions = document.querySelector(".side-actions");
+  if (sideActions) {
+    const mobileActionsQuery = window.matchMedia("(max-width: 640px)");
+    const toggleSideActions = () => {
+      const shouldShow = !mobileActionsQuery.matches || window.scrollY > 220;
+      sideActions.classList.toggle("is-visible", shouldShow);
+    };
+
+    toggleSideActions();
+    window.addEventListener("scroll", toggleSideActions, { passive: true });
+    mobileActionsQuery.addEventListener("change", toggleSideActions);
+  }
 
   document.querySelectorAll("[data-scroll-top]").forEach((button) => {
     button.addEventListener("click", () => {

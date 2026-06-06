@@ -3,7 +3,7 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const htmlFiles = ["index.html", "menu.html", "policy.html"];
-const jsFiles = ["js/main.js", "js/menu.js"];
+const jsFiles = ["js/main.js", "js/menu.js", "js/accessibility.js"];
 const failures = [];
 
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");

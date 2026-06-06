@@ -517,6 +517,17 @@ section:not(.hero) {
   margin-top: 14px;
 }
 
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.location-actions .map-link {
+  margin-top: 0;
+}
+
 .site-footer {
   width: var(--container);
   margin: 0 auto;

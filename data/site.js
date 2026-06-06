@@ -12,6 +12,7 @@ window.PIZZA_BALAD_SITE = {
   location: {
     display: "صندلة",
     mapUrl: "https://maps.app.goo.gl/jmn3ZD5AusEcXEPUA",
+    wazeUrl: "https://waze.com/ul?ll=32.520804,35.3251062&navigate=yes",
     embedUrl: "https://www.google.com/maps?q=32.520804,35.3251062&z=17&output=embed",
     latitude: 32.520804,
     longitude: 35.3251062
