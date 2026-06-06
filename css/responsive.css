@@ -159,8 +159,73 @@
     grid-template-columns: 1fr;
   }
 
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .feature-card {
+    aspect-ratio: 1;
+    display: grid;
+    align-content: space-between;
+    padding: 14px 12px;
+    min-width: 0;
+  }
+
+  .feature-card span {
+    margin-bottom: 0;
+    font-size: 13px;
+  }
+
+  .feature-card h3 {
+    margin: 0;
+    font-size: clamp(16px, 4.5vw, 19px);
+    line-height: 1.25;
+  }
+
+  .feature-card p {
+    margin: 0;
+    font-size: clamp(12px, 3.35vw, 14px);
+    line-height: 1.55;
+  }
+
   .gallery-grid {
     grid-auto-rows: 230px;
+  }
+
+  .contact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .contact-card {
+    min-height: 128px;
+    padding: 14px 10px;
+  }
+
+  .contact-card strong {
+    font-size: clamp(16px, 5.2vw, 21px);
+  }
+
+  .location-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .location-actions .map-icon-link {
+    min-height: 54px;
+    gap: 7px;
+    padding: 7px 8px;
+  }
+
+  .map-icon-link img {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .map-icon-link span {
+    font-size: 12px;
   }
 
   .gallery-item:first-child {

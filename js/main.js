@@ -42,7 +42,12 @@
 
   const safeWhatsAppHref = (value) => {
     const digits = digitsOnly(value);
-    return digits.length >= 7 && digits.length <= 15 ? `https://api.whatsapp.com/send?phone=${digits}` : "";
+    return digits.length >= 7 && digits.length <= 15 ? `https://api.whatsapp.com/send?phone=${digits}&type=phone_number&app_absent=0` : "";
+  };
+
+  const safeWhatsAppAppHref = (value) => {
+    const digits = digitsOnly(value);
+    return digits.length >= 7 && digits.length <= 15 ? `whatsapp://send?phone=${digits}` : "";
   };
 
   const safeLocalAsset = (value, fallback = FALLBACK_IMAGE) => {
@@ -99,6 +104,25 @@
     }
   };
 
+  const enhanceWhatsAppLinks = () => {
+    const appHref = safeWhatsAppAppHref(site.phone?.whatsapp);
+    if (!appHref) return;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+    if (!isMobile) return;
+
+    document.querySelectorAll("[data-site-whatsapp]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const fallbackHref = safeWhatsAppHref(site.phone?.whatsapp);
+        if (!fallbackHref) return;
+        event.preventDefault();
+        window.location.href = appHref;
+        window.setTimeout(() => {
+          window.location.href = fallbackHref;
+        }, 900);
+      });
+    });
+  };
+
   const applyFeaturedProducts = () => {
     document.querySelectorAll("[data-featured-id]").forEach((card) => {
       const product = menu.find((item) => item.id === Number(card.dataset.featuredId));
@@ -147,6 +171,7 @@
   };
 
   applySiteData();
+  enhanceWhatsAppLinks();
   applyFeaturedProducts();
   updateSchema();
 

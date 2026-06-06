@@ -19,11 +19,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=El+Messiri:wght@400;500;600;700&display=swap">
-  <link rel="preload" href="css/main.css?v=20260606-waze" as="style">
-  <link rel="stylesheet" href="css/main.css?v=20260606-waze">
+  <link rel="preload" href="css/main.css?v=20260606-location-inline-actions" as="style">
+  <link rel="stylesheet" href="css/main.css?v=20260606-location-inline-actions">
   <link rel="stylesheet" href="css/animations.css?v=20260601-logo-loader">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/enhancements.css?v=20260606-side-a11y-size">
+  <link rel="stylesheet" href="css/responsive.css?v=20260606-location-inline-actions">
+  <link rel="stylesheet" href="css/enhancements.css?v=20260606-home-card-motion">
   <link rel="stylesheet" href="css/accessibility.css?v=20260606-a11y-left">
   <script type="application/ld+json">
     {
@@ -130,7 +130,7 @@
         </div>
         <div class="feature-grid stagger-group">
           <article class="feature-card stagger-item"><span>01</span><h3>جودة عالية</h3><p>معايير ثابتة في كل طبق من أول طلب لآخر طلب.</p></article>
-          <article class="feature-card stagger-item"><span>02</span><h3>مكونات طازجة</h3><p>خضار يومية، صوص مطبوخ ببطء، وأجبان مختارة.</p></article>
+          <article class="feature-card stagger-item"><span>02</span><h3>مكونات طازجة</h3><p>خضار طازجة، صوص مبطوخ باحترافية وحب، أجبان مختارة.</p></article>
           <article class="feature-card stagger-item"><span>03</span><h3>تحضير يومي</h3><p>العجينة والصوص يحضران يومياً للحفاظ على النكهة.</p></article>
           <article class="feature-card stagger-item"><span>04</span><h3>خدمة سريعة</h3><p>تجهيز منظم يحافظ على الجودة والوقت معاً.</p></article>
         </div>
@@ -195,13 +195,19 @@
       <div class="location-grid">
         <iframe data-site-map-embed title="موقع بيتسا البلد على الخريطة" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=32.520804,35.3251062&z=17&output=embed"></iframe>
         <div class="info-panel">
-          <h3>بيتسا البلد</h3>
-          <p data-site-location>صندلة</p>
+          <h3>بيتسا البلد - صندلة</h3>
+          <p class="location-tagline">بيتسا البلد بتحبها كل البلد</p>
           <p data-site-hours>الثلاثاء - الأحد: 19:00 - 23:00</p>
           <p data-site-closed>الاثنين: مغلق</p>
           <div class="location-actions">
-            <a class="btn btn-ghost map-link" data-site-map-link href="https://maps.app.goo.gl/jmn3ZD5AusEcXEPUA" target="_blank" rel="noopener noreferrer">فتح الموقع على Google Maps</a>
-            <a class="btn btn-ghost map-link" data-site-waze-link href="https://waze.com/ul?ll=32.520804,35.3251062&navigate=yes" target="_blank" rel="noopener noreferrer">فتح الموقع في Waze</a>
+            <a class="btn btn-ghost map-link map-icon-link" data-site-map-link href="https://maps.app.goo.gl/jmn3ZD5AusEcXEPUA" target="_blank" rel="noopener noreferrer" aria-label="فتح الموقع على Google Maps">
+              <img src="assets/google-maps-icon.svg" alt="" aria-hidden="true" loading="lazy">
+              <span>Google Maps</span>
+            </a>
+            <a class="btn btn-ghost map-link map-icon-link" data-site-waze-link href="https://waze.com/ul?ll=32.520804,35.3251062&navigate=yes" target="_blank" rel="noopener noreferrer" aria-label="فتح الموقع في Waze">
+              <img src="assets/waze-icon.svg" alt="" aria-hidden="true" loading="lazy">
+              <span>Waze</span>
+            </a>
           </div>
         </div>
       </div>
@@ -216,8 +222,8 @@
         <a class="contact-card" data-site-phone-link href="tel:0502210075"><span>هاتف</span><strong data-site-phone>050-221-0075</strong></a>
         <a class="contact-card" data-site-whatsapp href="https://api.whatsapp.com/send?phone=972502210075" target="_blank" rel="noopener noreferrer"><span>واتساب</span><strong>راسلنا الآن</strong></a>
         <a class="contact-card" data-site-instagram href="https://instagram.com/pizza._.albld" target="_blank" rel="noopener noreferrer"><span>إنستغرام</span><strong data-site-instagram-handle>@pizza._.albld</strong></a>
+        <a class="contact-card" data-site-map-link href="https://maps.app.goo.gl/jmn3ZD5AusEcXEPUA" target="_blank" rel="noopener noreferrer"><span>الموقع</span><strong>افتح الخريطة</strong></a>
       </div>
-      <a class="btn btn-primary contact-cta" data-site-phone-link href="tel:0502210075">اتصال مباشر</a>
     </section>
 
     <section class="cta-band section-reveal">
@@ -234,7 +240,6 @@
     <p>© <span id="year"></span> بيتسا البلد. كل الحقوق محفوظة.</p>
     <p class="credit-line">تم تطوير الموقع في شركة <a href="https://oh-tech.co" target="_blank" rel="noopener noreferrer">O&amp;H Tech</a></p>
     <a href="policy.html">سياسة الموقع والخصوصية</a>
-    <a href="#top">العودة للأعلى</a>
   </footer>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">
@@ -254,7 +259,7 @@
 
   <script src="data/site.js?v=20260606-waze"></script>
   <script src="data/menu.js"></script>
-  <script src="js/main.js?v=20260606-scrolltop-mobile" defer></script>
+  <script src="js/main.js?v=20260606-whatsapp-business-map-icons" defer></script>
   <script src="js/animations.js?v=20260601-logo-loader" defer></script>
   <script src="js/accessibility.js?v=20260606-a11y" defer></script>
 </body>
