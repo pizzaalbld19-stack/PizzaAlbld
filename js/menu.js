@@ -23,6 +23,8 @@
   const orderConfirmModal = document.getElementById("orderConfirmModal");
   const rejectOrderConfirm = document.getElementById("rejectOrderConfirm");
   const acceptOrderConfirm = document.getElementById("acceptOrderConfirm");
+  const customerNameInput = document.getElementById("customerNameInput");
+  const customerNameError = document.getElementById("customerNameError");
   const toastStack = document.getElementById("toastStack");
   const customizer = document.getElementById("customizer");
   const closeCustomizer = document.getElementById("closeCustomizer");
@@ -67,6 +69,11 @@
 
   const formatPrice = (price) => `${price} ₪`;
   const normalize = (value) => String(value || "").trim().toLowerCase();
+  const sanitizeCustomerName = (value) => String(value || "")
+    .replace(/[\u0000-\u001f\u007f<>\\{}[\]`~^|]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 40);
   const toArray = (value) => Array.isArray(value) ? value : [];
   const uniqueValues = (values) => [...new Set(toArray(values).map((value) => String(value || "").trim()).filter(Boolean))];
   const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -1274,8 +1281,9 @@
   };
 
   /* ---------- إتمام الطلب عبر واتساب ---------- */
-  const buildOrderText = () => {
-    const lines = ["طلب جديد من بيتسا البلد", ""];
+  const buildOrderText = (customerName) => {
+    const safeCustomerName = sanitizeCustomerName(customerName);
+    const lines = [`طلب جديد من ${safeCustomerName}`, ""];
     let total = 0;
 
     cart.forEach((item, index) => {
@@ -1299,14 +1307,36 @@
     return lines.join("\n");
   };
 
+  const setCustomerNameError = (message = "") => {
+    if (!customerNameError) return;
+    customerNameError.textContent = message;
+  };
+
+  const getConfirmedCustomerName = () => {
+    const customerName = sanitizeCustomerName(customerNameInput?.value);
+    if (customerNameInput) {
+      customerNameInput.value = customerName;
+      customerNameInput.setAttribute("aria-invalid", customerName ? "false" : "true");
+    }
+    if (!customerName) {
+      setCustomerNameError("الرجاء إدخال اسم الزبون قبل الإرسال.");
+      customerNameInput?.focus();
+      return "";
+    }
+    setCustomerNameError("");
+    return customerName;
+  };
+
   const openOrderConfirm = () => {
     if (!orderConfirmModal) {
       sendOrderToWhatsApp();
       return;
     }
+    setCustomerNameError("");
+    if (customerNameInput) customerNameInput.setAttribute("aria-invalid", "false");
     orderConfirmModal.classList.add("is-open");
     orderConfirmModal.setAttribute("aria-hidden", "false");
-    acceptOrderConfirm?.focus();
+    customerNameInput?.focus();
   };
 
   const closeOrderConfirm = () => {
@@ -1315,8 +1345,8 @@
     orderConfirmModal.setAttribute("aria-hidden", "true");
   };
 
-  const sendOrderToWhatsApp = () => {
-    const text = encodeURIComponent(buildOrderText());
+  const sendOrderToWhatsApp = (customerName) => {
+    const text = encodeURIComponent(buildOrderText(customerName));
     const whatsapp = safeWhatsAppNumber(site.phone?.whatsapp);
     if (whatsapp) {
       const win = window.open(`https://api.whatsapp.com/send?phone=${whatsapp}&text=${text}`, "_blank", "noopener,noreferrer");
@@ -1400,11 +1430,24 @@
   if (rejectOrderConfirm) rejectOrderConfirm.addEventListener("click", closeOrderConfirm);
   if (acceptOrderConfirm) {
     acceptOrderConfirm.addEventListener("click", () => {
+      const customerName = getConfirmedCustomerName();
+      if (!customerName) return;
       closeOrderConfirm();
-      sendOrderToWhatsApp();
+      sendOrderToWhatsApp(customerName);
       cart = [];
       renderCart();
       closeCart();
+    });
+  }
+  if (customerNameInput) {
+    customerNameInput.addEventListener("input", () => {
+      customerNameInput.setAttribute("aria-invalid", "false");
+      setCustomerNameError("");
+    });
+    customerNameInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      acceptOrderConfirm?.click();
     });
   }
 

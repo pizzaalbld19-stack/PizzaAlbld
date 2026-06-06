@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=El+Messiri:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/main.css?v=20260606-close-center">
-  <link rel="stylesheet" href="css/menu.css?v=20260606-strong-slice-colors">
+  <link rel="stylesheet" href="css/menu.css?v=20260606-customer-name-confirm">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/enhancements.css?v=20260606-availability">
   <link rel="stylesheet" href="css/accessibility.css?v=20260606-a11y-left">
@@ -169,6 +169,11 @@
       <span class="category-pill">تأكيد الإرسال</span>
       <h2 id="orderConfirmTitle">الرجاء تأكيد الطلب</h2>
       <p>سيتم فتح واتساب لإرسال ملخص الطلب إلى المطعم. الطلب لا يتم تحضيره إلا بعد تأكيد المطعم.</p>
+      <label class="order-confirm-field" for="customerNameInput">
+        <span>اسم الزبون</span>
+        <input id="customerNameInput" type="text" name="customerName" autocomplete="name" maxlength="40" required placeholder="اكتب الاسم هنا">
+      </label>
+      <p class="order-confirm-error" id="customerNameError" role="alert" aria-live="polite"></p>
       <div class="order-confirm-actions">
         <button class="order-confirm-reject" id="rejectOrderConfirm" type="button">رفض</button>
         <button class="order-confirm-accept" id="acceptOrderConfirm" type="button">تأكيد</button>
@@ -187,7 +192,7 @@
 
   <script src="data/site.js"></script>
   <script src="data/menu.js?v=20260606-availability"></script>
-  <script src="js/menu.js?v=20260606-confirm-clear-cart" defer></script>
+  <script src="js/menu.js?v=20260606-customer-name-confirm" defer></script>
   <script src="js/accessibility.js?v=20260606-a11y" defer></script>
 </body>
 </html>

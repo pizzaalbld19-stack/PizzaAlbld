@@ -1515,6 +1515,52 @@
   line-height: 1.8;
 }
 
+.order-confirm-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  text-align: right;
+  color: #fff1cf;
+  font-weight: 900;
+}
+
+.order-confirm-field input {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid rgba(248, 198, 93, .34);
+  border-radius: 14px;
+  padding: 0 14px;
+  color: #fff8eb;
+  background: rgba(255, 255, 255, .07);
+  outline: 0;
+  font: inherit;
+  font-weight: 800;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.order-confirm-field input::placeholder {
+  color: rgba(255, 246, 232, .52);
+}
+
+.order-confirm-field input:focus {
+  border-color: rgba(255, 209, 102, .88);
+  background: rgba(255, 255, 255, .1);
+  box-shadow: 0 0 0 4px rgba(248, 198, 93, .14);
+}
+
+.order-confirm-field input[aria-invalid="true"] {
+  border-color: rgba(255, 88, 73, .92);
+  box-shadow: 0 0 0 4px rgba(255, 88, 73, .14);
+}
+
+.order-confirm-error {
+  min-height: 22px;
+  margin: 8px 0 0;
+  color: #ffb3a8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .order-confirm-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
