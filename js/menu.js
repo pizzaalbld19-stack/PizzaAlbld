@@ -1176,9 +1176,10 @@
     if (!sections.length) return [];
 
     const lines = [
-      "   🍕 تفاصيل شرائح البيتسا:",
-      `   نوع العجينة: ${item.doughType || "عادي"}`,
-      `   عدد القطع: ${sections.length}`
+      "تفاصيل البيتسا:",
+      `نوع العجينة: ${item.doughType || "عادي"}`,
+      `عدد القطع: ${sections.length}`,
+      ""
     ];
 
     buildPizzaSectionGroups(sections).forEach((group) => {
@@ -1192,15 +1193,20 @@
         ...toArray(section.removedIngredients).map((name) => `بدون ${name}`)
       ];
       const fraction = formatPrettyFraction(group.count, sections.length);
-      lines.push(`   ${fraction} | ${formatSliceRange(group.start, group.end)}`);
-      lines.push(`      ${items.length ? items.join("، ") : "بدون تعديلات"}`);
+      lines.push(`- ${fraction} | ${formatSliceRange(group.start, group.end)}`);
+      if (items.length) {
+        items.forEach((detail) => lines.push(`  ${detail}`));
+      } else {
+        lines.push("  بدون إضافات");
+      }
+      lines.push("");
     });
 
     const paid = uniqueValues(sections.flatMap((section) => section.paidAdditions || []));
-    if (paid.length) lines.push(`   الإضافات المدفوعة المحتسبة: ${paid.join("، ")}`);
-    if (item.sliceAddonsCost) lines.push(`   تكلفة الإضافات المختارة: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
+    if (paid.length) lines.push(`الإضافات المدفوعة المحتسبة: ${paid.join("، ")}`);
+    if (item.sliceAddonsCost) lines.push(`تكلفة الإضافات: +${formatPrice(item.sliceAddonsCost)} للوحدة`);
 
-    return lines;
+    return lines.filter((line, index, list) => !(line === "" && list[index - 1] === ""));
   };
 
   const renderCart = () => {
@@ -1266,22 +1272,24 @@
 
   /* ---------- إتمام الطلب عبر واتساب ---------- */
   const buildOrderText = () => {
-    const lines = ["طلب جديد من بيتسا البلد:", ""];
+    const lines = ["طلب جديد من بيتسا البلد", ""];
     let total = 0;
 
     cart.forEach((item, index) => {
       const product = getProduct(item.productId);
       if (!product) return;
       total += itemTotal(item);
-      lines.push(`${index + 1}) ${product.name} × ${item.qty} — ${formatPrice(itemTotal(item))}`);
+      if (index > 0) lines.push("");
+      lines.push(`${index + 1}. ${product.name} × ${item.qty}`);
+      lines.push(`السعر: ${formatPrice(itemTotal(item))}`);
       if (item.splitMode === "slices") {
         lines.push(...buildWhatsAppPizzaDetails(item, product));
       } else if (item.removedIngredients.length) {
-        lines.push(`   بدون: ${item.removedIngredients.join("، ")}`);
+        lines.push(`بدون: ${item.removedIngredients.join("، ")}`);
       }
-      if (item.freeAddons.length) lines.push(`   إضافات مجانية: ${item.freeAddons.join("، ")}`);
-      if (item.paidAddons.length) lines.push(`   إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} (+${formatPrice(addon.price)})`).join("، ")}`);
-      if (item.notes) lines.push(`   ملاحظة: ${item.notes}`);
+      if (item.freeAddons.length) lines.push(`إضافات مجانية: ${item.freeAddons.join("، ")}`);
+      if (item.paidAddons.length) lines.push(`إضافات مدفوعة: ${item.paidAddons.map((addon) => `${addon.name} (+${formatPrice(addon.price)})`).join("، ")}`);
+      if (item.notes) lines.push(`ملاحظة: ${item.notes}`);
     });
 
     lines.push("", `المجموع التقريبي: ${formatPrice(total)}`);
