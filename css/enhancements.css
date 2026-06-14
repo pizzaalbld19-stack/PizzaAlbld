@@ -2121,8 +2121,10 @@ body {
     rgba(18, 12, 9, .78);
   box-shadow:
     0 18px 46px rgba(0, 0, 0, .42),
-    0 0 0 0 rgba(77, 203, 230, .34);
-  animation: wazeAttention 2.4s ease-in-out infinite;
+    0 0 0 4px rgba(77, 203, 230, .1);
+  animation: none;
+  overflow: visible;
+  isolation: isolate;
 }
 
 .side-action-waze {
@@ -2136,6 +2138,7 @@ body {
   height: 38px;
   border-radius: 12px;
   object-fit: cover;
+  animation: none;
 }
 
 .floating-action-label,
@@ -2151,6 +2154,13 @@ body {
   font-weight: 900;
   line-height: 1;
   pointer-events: none;
+  z-index: 3;
+  display: block;
+  visibility: visible;
+  opacity: 0;
+  white-space: nowrap;
+  animation: none;
+  transition: opacity .18s ease, transform .18s ease;
 }
 
 .floating-action-label {
@@ -2175,7 +2185,24 @@ body {
 .menu-waze-float span {
   left: calc(100% + 10px);
   bottom: 50%;
-  transform: translateY(50%);
+  transform: translate(4px, 50%);
+}
+
+.side-action-waze:hover .floating-action-label,
+.side-action-waze:focus-visible .floating-action-label,
+.menu-waze-float:hover span,
+.menu-waze-float:focus-visible span {
+  opacity: 1;
+}
+
+.side-action-waze:hover .floating-action-label,
+.side-action-waze:focus-visible .floating-action-label {
+  transform: translate(0, -50%);
+}
+
+.menu-waze-float:hover span,
+.menu-waze-float:focus-visible span {
+  transform: translate(0, 50%);
 }
 
 .side-action-waze:hover,
@@ -2186,21 +2213,6 @@ body {
   box-shadow:
     0 22px 54px rgba(0, 0, 0, .48),
     0 0 0 6px rgba(77, 203, 230, .12);
-}
-
-@keyframes wazeAttention {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    box-shadow:
-      0 18px 46px rgba(0, 0, 0, .42),
-      0 0 0 0 rgba(77, 203, 230, .34);
-  }
-  50% {
-    transform: translateY(-4px) scale(1.035);
-    box-shadow:
-      0 22px 54px rgba(0, 0, 0, .48),
-      0 0 0 7px rgba(77, 203, 230, 0);
-  }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
@@ -2245,13 +2257,6 @@ body {
   .menu-waze-float span {
     left: calc(100% + 8px);
     bottom: 50%;
-    transform: translateY(50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .side-action-waze,
-  .menu-waze-float {
-    animation: none;
+    transform: translate(4px, 50%);
   }
 }
